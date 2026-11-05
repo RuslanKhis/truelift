@@ -636,7 +636,7 @@ Each phase 1 goal lives in its ticket under `docs/tickets/truelift/`. The ticket
 
 ## Phase 2: graduate for outside CMOs (after W1)
 
-Detail follows certainty: these goals will be refined after W1.
+Detail follows certainty: these goals will be refined after W1. The steps from feedback to phase 2 tickets and issues are in [truelift-after-demo.md](truelift-after-demo.md).
 
 - **G23 Installer and packaging (Mac, Windows).** CI builds a wheel containing the SPA. `uv tool install truelift`. An install page written for pasting into an LLM assistant. Handles `libomp` on macOS and loky on Windows. *Skill:* `adk-release-engineering`. *Estimate:* 6–10 h. *Acceptance:* a clean Mac and a clean Windows VM go from the install page to the results page with no terminal steps beyond those the page lists.
 - **G24 DAG and run comparison view.** Side-by-side DAG diff (edges and `x_cols`) and results, labelled with C9 versions. *Skill:* `adk-frontend-integration`. *Estimate:* 5–8 h. *Acceptance:* two runs with different DAG versions show the diff and both headline results, with a version-mismatch warning.
