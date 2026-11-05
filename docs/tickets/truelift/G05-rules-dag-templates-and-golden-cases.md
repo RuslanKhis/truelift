@@ -24,7 +24,7 @@ estimate:
   total: 5-8
   handoff: 0.25
   calendar_waits: none
-owner: Thao
+owner: Thao            # suggested owner; anyone may pick this ticket
 status: ready
 ---
 

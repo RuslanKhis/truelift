@@ -24,7 +24,7 @@ estimate:
   total: 9-13
   handoff: 0.5
   calendar_waits: none
-owner: Chloe
+owner: Chloe            # suggested owner; anyone may pick this ticket
 status: ready
 ---
 
@@ -37,6 +37,7 @@ The CMO talks to the agent, accepts or rejects proposals, and confirms the DAG a
 ## Scope
 
 - In: SSE over `fetch` with zod-validated events. Proposal and contradiction cards. Edge cards. React Flow with ELK layout (exact version pinned). Identification panel.
+- Out: the live Interviewer; this ticket builds against the G02 fake stream, and G20 connects the live agent.
 - Route: SSE over `fetch` with zod-validated events. Proposal and contradiction cards. Edge cards. React Flow with ELK layout (exact version pinned). Identification panel.
 - Depth: MVP depth per design §3; floor kept (no secrets, spend stop, pinned models).
 

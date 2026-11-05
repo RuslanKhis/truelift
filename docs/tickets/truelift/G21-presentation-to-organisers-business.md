@@ -24,7 +24,7 @@ estimate:
   total: 3.5-6
   handoff: 0.5
   calendar_waits: none
-owner: Chloe
+owner: Chloe            # suggested owner; anyone may pick this ticket
 status: ready
 ---
 
@@ -33,6 +33,8 @@ status: ready
 ## Outcome
 
 The organisers understand what a CMO gets, see the demo, and see the benchmark evidence (C14).
+
+Owner note: Chloe prepares; Ruslan presenting is still to be confirmed.
 
 ## Scope
 

@@ -24,7 +24,7 @@ estimate:
   total: 6-9
   handoff: 0.5
   calendar_waits: none
-owner: Chloe
+owner: Chloe            # suggested owner; anyone may pick this ticket
 status: ready
 ---
 

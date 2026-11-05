@@ -24,7 +24,7 @@ estimate:
   total: 4-7
   handoff: none
   calendar_waits: none
-owner: Ruslan
+owner: Ruslan            # suggested owner; anyone may pick this ticket
 status: ready
 ---
 

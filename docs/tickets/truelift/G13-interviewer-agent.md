@@ -4,7 +4,7 @@ title: Interviewer agent
 design: docs/architecture/truelift.md
 plan: docs/plans/truelift.md
 primary_skill: adk-workflow-design
-supporting_skills: [adk-agent-instructions (prompt), adk-tool-interface-design (tools), adk-agent-security (injection case)]
+supporting_skills: [adk-agent-instructions (prompt), adk-tool-interface-design (tools), adk-agent-security (injection case), adk-model-and-output-contracts (SlotFill and Proposal schemas), adk-frontend-integration (stream route)]
 docs: [adk-workflow-design/references/callbacks.md, adk-tool-interface-design/references/function-tool-contract.md]
 blocked_by: [G06, G07, G08, G11, G12]
 touches: [src/truelift/agents/interviewer.py, src/truelift/prompts/interviewer.md, src/truelift/api/routes/agent.py, tests/agents/test_interviewer.py, tests/fixtures/replays/]
@@ -24,7 +24,7 @@ estimate:
   total: 5.5-9.5
   handoff: 1
   calendar_waits: none
-owner: Ruslan
+owner: Ruslan            # suggested owner; anyone may pick this ticket
 status: ready
 ---
 

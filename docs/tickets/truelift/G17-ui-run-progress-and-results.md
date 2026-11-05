@@ -24,7 +24,7 @@ estimate:
   total: 6-9
   handoff: 0.5
   calendar_waits: none
-owner: Chloe
+owner: Chloe            # suggested owner; anyone may pick this ticket
 status: ready
 ---
 
@@ -37,6 +37,7 @@ The user sees honest progress and a results page where the numbers come from cod
 ## Scope
 
 - In: 
+- Out: the live Explainer; the narrative renders from a `Narrative` fixture, and G20 connects the live agent.
 - Route: see design
 - Depth: MVP depth per design §3; floor kept (no secrets, spend stop, pinned models).
 
