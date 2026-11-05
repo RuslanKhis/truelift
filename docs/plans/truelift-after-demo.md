@@ -57,7 +57,7 @@ If you only have rough notes or a call transcript, Claude can fill the template 
 Turn my notes in <path to notes> into docs/feedback/truelift-organisers-<YYYY-MM-DD>.md using the template in docs/plans/truelift-after-demo.md. Map each item to the contract, decision or goal IDs it affects in docs/architecture/truelift.md and docs/plans/truelift.md. Quote nothing from private/.
 ```
 
-Then close issue #24 (W1) with a link to the feedback file, and move its board card to Done.
+Then close issue #24 (W1) with a link to the feedback file.
 
 ## Step 2: Fold the feedback into the design and plan (about 1–2 h, with Thao)
 
@@ -92,22 +92,22 @@ The script skips any goal that already has an issue, so it is safe to rerun.
 ```bash
 gh auth status        # needs the 'project' scope: gh auth refresh -s project
 python3 scripts/tickets_to_github.py --phase 2 --milestone M2            # dry run: read what it would create
-python3 scripts/tickets_to_github.py --phase 2 --milestone M2 --apply    # create issues, labels, milestone, board cards
+python3 scripts/tickets_to_github.py --phase 2 --milestone M2 --apply    # create issues, labels, milestone
 ```
 
 New issues get one of two labels:
 - `ready to pick`, when all their blockers are closed;
 - `blocked`, otherwise.
 
-They also get a `suggested: …` label for the suggested owner, and they land in the Todo column of the board.
+They also get a `suggested: …` label for the suggested owner. Add `--project <number>` only if you want them on a board as well.
 
 ## Step 5: Tell the team
 
-Post the pickup message in Slack (see the message Ruslan keeps for phase 1), changing the milestone name to M2. Remind people that phase 2 issues starting with G23 (installer) and G28 (privacy note) were outlines until Step 2, so they should read the ticket, not the old plan text.
+Tell the team the M2 issues are up. They pick work the same way as in phase 1: in Claude Code, inside the repo, they ask "what can I grab?". The `pick-ticket` project skill lists the free issues, assigns the chosen one and prints its adk prompt. Remind people that phase 2 issues starting with G23 (installer) and G28 (privacy note) were outlines until Step 2, so they should read the ticket, not the old plan text.
 
-## Keeping the board honest during phase 2
+## Keeping issues honest during phase 2
 
-- When a PR closes an issue, check the issues it blocked. Remove `blocked` and add `ready to pick` to each one whose blockers are now all closed.
+- Labels fix themselves: each time someone asks Claude what is free, `pick-ticket` swaps `blocked` for `ready to pick` on issues whose blockers have all closed.
 - Once a week (about 10 min), get a status update and a list of tickets whose evidence is overdue:
 
 ```text

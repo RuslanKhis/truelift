@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Export ticket files to GitHub issues, a milestone, labels and the project board.
+"""Export ticket files to GitHub issues, a milestone and labels (optionally a project board).
 
 Idempotent: a ticket whose issue already exists (title starts with its goal ID) is skipped.
 The ticket file stays the source of truth for acceptance, status and evidence; the issue
@@ -32,7 +32,7 @@ ap.add_argument("--repo", default="RuslanKhis/truelift")
 ap.add_argument("--tickets", default="docs/tickets/truelift")
 ap.add_argument("--phase", default="1")
 ap.add_argument("--milestone", default="M1")
-ap.add_argument("--project", type=int, default=1, help="user project number of the board")
+ap.add_argument("--project", type=int, default=0, help="also add issues to this user project board (0 = no board)")
 ap.add_argument("--branch", default="main")
 ap.add_argument("--apply", action="store_true")
 args = ap.parse_args()
@@ -126,7 +126,7 @@ for path in sorted(pathlib.Path(args.tickets).glob("*.md")):
 | Primary skill | `{f.get('primary_skill')}` |
 | Type | {f.get('type')} |
 
-**To pick this up (anyone):** check that the blockers are closed, self-assign, move the board card to *In Progress*, then run in Claude Code:
+**To pick this up (anyone):** in Claude Code, in the repo, ask *"what can I grab?"* (project skill `pick-ticket`). It checks the blockers, assigns the issue to you and makes a branch. Then run:
 
 ```text
 {run.group(1).strip() if run else ''}
@@ -146,8 +146,8 @@ Acceptance lives only in the ticket file; evidence goes in its Evidence section,
     created.append(number)
     print(f"{gid}: {'created #' + number if out else 'would create'}")
 
-# Add new issues to the board, in the Todo column.
-if created and args.apply:
+# Optionally add new issues to a project board, in the Todo column.
+if created and args.apply and args.project:
     proj = graphql(f'query{{user(login:"{OWNER}"){{projectV2(number:{args.project}){{id '
                    f'field(name:"Status"){{... on ProjectV2SingleSelectField{{id options{{id name}}}}}}}}}}}}')
     p = proj["data"]["user"]["projectV2"]
