@@ -74,7 +74,7 @@ Estimates are person-hours of human effort with a coding agent: hands-on work pl
 | Thao (econometrics) | G04, G05, G07, G10, G12, G19, G22 | 31–51 | 88 |
 | Chloe (React) | G15, G16, G17, G20, G21 | 28.5–42.5 | 88 |
 
-Load fits easily. The calendar is set by dependencies, by one person doing one goal at a time, and by W1.
+Owners are **suggestions** used for the schedule check, not assignments: anyone may self-assign a ticket whose blockers are done (GitHub issues #2–#24, board *truelift M1*). Load fits easily. The calendar is set by dependencies, by one person doing one goal at a time, and by W1.
 
 ### Capacity and cut line
 

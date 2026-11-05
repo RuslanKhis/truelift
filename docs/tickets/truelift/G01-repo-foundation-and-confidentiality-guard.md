@@ -24,7 +24,7 @@ estimate:
   total: 2-4
   handoff: none
   calendar_waits: none
-owner: Ruslan
+owner: Ruslan            # suggested owner; anyone may pick this ticket
 status: ready
 ---
 
@@ -43,6 +43,8 @@ A fresh clone builds and tests. Nothing private or secret can be committed or re
 ## Constraints
 
 Keep D12 (launch token, loopback only), D2 (stage machine in code; agents only propose) and C13 (nothing from `private/` in the repo). Pins live in AGENTS.md and the plan's *Destination and constraints*.
+
+Execution scope: local repository plus GitHub Actions on the existing remote. No publishing to PyPI.
 
 ## Resources created
 
