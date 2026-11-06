@@ -1,0 +1,25 @@
+# pre-commit hooks for truelift. Install with `make dev`.
+# The guard and gitleaks are the confidentiality floor (design D13, contract C13).
+repos:
+  - repo: local
+    hooks:
+      - id: guard-public
+        name: confidentiality guard (D13)
+        entry: uv run --locked python scripts/guard_public.py --staged
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: ruff-check
+        name: ruff check
+        entry: uv run --locked ruff check --force-exclude
+        language: system
+        types: [python]
+      - id: ruff-format
+        name: ruff format
+        entry: uv run --locked ruff format --force-exclude
+        language: system
+        types: [python]
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks

@@ -1,0 +1,37 @@
+# gitleaks configuration for truelift (design D13, contract C13).
+# Keeps gitleaks' default rules and adds the four key patterns from D13.
+# The same patterns live in scripts/guard_public.py; change both together.
+# RE2 has no look-behind, so the leading group stops matches inside identifiers.
+
+title = "truelift"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "truelift-google-api-key"
+description = "Google API key (AIza...)"
+regex = '''(?:^|[^0-9A-Za-z_.-])(AIza[0-9A-Za-z_-]{35})'''
+secretGroup = 1
+keywords = ["aiza"]
+
+[[rules]]
+id = "truelift-google-aq-key"
+description = "Google API key, AQ. format"
+regex = '''(?:^|[^0-9A-Za-z_.-])(AQ\.[0-9A-Za-z_-]{20,})'''
+secretGroup = 1
+keywords = ["aq."]
+
+[[rules]]
+id = "truelift-anthropic-api-key"
+description = "Anthropic API key (sk-ant-...)"
+regex = '''(?:^|[^0-9A-Za-z_.-])(sk-ant-[0-9A-Za-z_-]{20,})'''
+secretGroup = 1
+keywords = ["sk-ant-"]
+
+[[rules]]
+id = "truelift-openai-api-key"
+description = "OpenAI API key (sk-... or sk-proj-...)"
+regex = '''(?:^|[^0-9A-Za-z_.-])(sk-(?:proj-)?[0-9A-Za-z_-]{20,})'''
+secretGroup = 1
+keywords = ["sk-"]

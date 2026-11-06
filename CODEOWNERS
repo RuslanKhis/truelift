@@ -1,0 +1,21 @@
+# Code owners for truelift. GitHub requests a review from the owners of every
+# changed path; the last matching pattern wins.
+
+# Default owner.
+*                                   @RuslanKhis
+
+# Confidentiality guard (design D13). The two files allowed to name the
+# hackathon truth prefix, plus the configs that enforce the guard.
+/scripts/guard_public.py            @RuslanKhis
+/src/truelift/causal/forbidden.py   @RuslanKhis
+/.gitleaks.toml                     @RuslanKhis
+/.pre-commit-config.yaml            @RuslanKhis
+/.github/                           @RuslanKhis
+
+# Econometrics (design D18): Thao owns rules/ and templates/ and is a required
+# reviewer for the causal core. Replace @RuslanKhis with Thao's GitHub handle
+# on these three lines once Thao has access to the repository; GitHub ignores
+# owners without write access.
+/rules/                             @RuslanKhis
+/templates/                         @RuslanKhis
+/src/truelift/causal/               @RuslanKhis
