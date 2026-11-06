@@ -25,7 +25,7 @@ estimate:
   handoff: none
   calendar_waits: none
 owner: Ruslan            # suggested owner; anyone may pick this ticket
-status: verified_live
+status: done
 ---
 
 # G01 Repo foundation and confidentiality guard
@@ -112,9 +112,9 @@ Resources that charge: none.
 
 Human effort still owed (about 0.5–1 h):
 - Review the diff. Look especially at the `scripts/guard_public.py` rules and the `.gitleaks.toml` regexes.
-- In GitHub branch protection for `main`, mark `ci / confidentiality guard and gitleaks (full history)` and `ci / make check and package content check` as required checks. C13 calls the CI job "required", which is a repository setting only an admin can change.
-- Give `CODEOWNERS` Thao's GitHub handle: replace `@RuslanKhis` on the `/rules/`, `/templates/` and `/src/truelift/causal/` lines (D18). The only collaborator today is `RuslanKhis`.
 - Each developer runs `make dev` once to install the hooks. The first gitleaks hook run downloads a Go toolchain, which takes a few minutes.
+
+Done 2026-11-06: PR #28 merged by the owner (acceptance). Both CI jobs are required checks on `main`. CODEOWNERS names Thao (`@thithachthaotran`) for the D18 paths; it takes effect when Thao accepts the invitation.
 
 actual: not reported
 
