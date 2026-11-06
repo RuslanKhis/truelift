@@ -25,7 +25,7 @@ estimate:
   handoff: none
   calendar_waits: none
 owner: Ruslan            # suggested owner; anyone may pick this ticket
-status: verified_local
+status: verified_live
 ---
 
 # G01 Repo foundation and confidentiality guard
@@ -75,11 +75,10 @@ Acceptance:
   - Output never contains the key or the prefix (tested).
   - On the real tree, `--tree` exits 0.
   - In a scratch clone, `pre-commit` blocked a commit of `private/a.txt`: guard hook exit 1, commit refused. That is `local, pass`.
-- A3: `local, pass` for the content; `live, not run` for the CI run.
+- A3: `local, pass` and `live, pass`. GitHub Actions run 42190724189 on commit 2b341af (push, 2026-11-06): both jobs succeeded. In that run, `guard --tree` was clean (44 files), `guard --history` was clean (108 blobs) and gitleaks scanned 12 commits with no leaks found.
   - `.github/workflows/ci.yml` runs on every push and pull request. The `confidentiality` job uses `fetch-depth: 0` and runs `guard --tree`, `guard --history`, then gitleaks 8.30.1 (pinned, sha256-verified) `git --log-opts=--all`.
   - Current history is clean: `guard --history` reported "clean (82 blobs)". `gitleaks git --log-opts=--all` found no leaks across 11 commits. The fresh clone with G01 committed was also clean: 102 blobs, gitleaks no leaks.
   - The custom gitleaks rules caught all four fake keys. The near-miss file passed. The pre-commit gitleaks hook applied the custom `truelift-google-aq-key` rule.
-  - Owed: the first GitHub Actions run after push.
 - A4: `offline, pass`. `uv run pytest -m private -rs`: 1 collected, 1 skipped, "private materials absent"; `private/benchmark.yaml` is absent here.
 - A5: `local, pass`.
   - `uv.lock` is created; it is committed with this change.
@@ -90,7 +89,7 @@ Acceptance:
   - The content check exits 1 for wheel and sdist fixtures holding `private/…`, a `.csv` outside `data/sample/`, an `.ipynb` or a `.pdf` (`offline, pass`).
 
 Contracts and security rules:
-- C13: evidenced, local; G01/A1–A6. The CI run (A3) is owed after push.
+- C13: evidenced, live; G01/A1–A6. A3 includes CI run 42190724189.
 - SB15: evidenced, local; A5 (supply chain, Minimal). The lockfile is committed, `--locked` is on every `uv run`, and the audit runs in `make check`. CI actions are pinned to commit SHAs and the gitleaks binary is checksum-verified.
 - SB16: evidenced, local; A2 (offline) and A3 (local) (secrets, Build). The guard checks the four key patterns, and gitleaks runs its default rules plus the four custom ones.
 
@@ -113,7 +112,6 @@ Resources that charge: none.
 
 Human effort still owed (about 0.5–1 h):
 - Review the diff. Look especially at the `scripts/guard_public.py` rules and the `.gitleaks.toml` regexes.
-- Commit, push, and confirm both CI jobs pass on GitHub (A3 live).
 - In GitHub branch protection for `main`, mark `ci / confidentiality guard and gitleaks (full history)` and `ci / make check and package content check` as required checks. C13 calls the CI job "required", which is a repository setting only an admin can change.
 - Give `CODEOWNERS` Thao's GitHub handle: replace `@RuslanKhis` on the `/rules/`, `/templates/` and `/src/truelift/causal/` lines (D18). The only collaborator today is `RuslanKhis`.
 - Each developer runs `make dev` once to install the hooks. The first gitleaks hook run downloads a Go toolchain, which takes a few minutes.
