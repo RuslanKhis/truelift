@@ -13,9 +13,8 @@
 /.github/                           @RuslanKhis
 
 # Econometrics (design D18): Thao owns rules/ and templates/ and is a required
-# reviewer for the causal core. Replace @RuslanKhis with Thao's GitHub handle
-# on these three lines once Thao has access to the repository; GitHub ignores
-# owners without write access.
-/rules/                             @RuslanKhis
-/templates/                         @RuslanKhis
-/src/truelift/causal/               @RuslanKhis
+# reviewer for the causal core. GitHub ignores owners without write access, so
+# these lines take effect once Thao accepts the collaborator invitation.
+/rules/                             @thithachthaotran
+/templates/                         @thithachthaotran
+/src/truelift/causal/               @thithachthaotran @RuslanKhis
