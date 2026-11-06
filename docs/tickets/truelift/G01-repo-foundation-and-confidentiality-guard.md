@@ -25,7 +25,7 @@ estimate:
   handoff: none
   calendar_waits: none
 owner: Ruslan            # suggested owner; anyone may pick this ticket
-status: ready
+status: verified_live
 ---
 
 # G01 Repo foundation and confidentiality guard
@@ -63,6 +63,60 @@ Verification, automated: `make check` exits 0; `uv run pytest tests/test_guard.p
 Verification, manual: none.
 
 ## Evidence
+
+Session 2026-11-06, branch `g01-repo-foundation`, changes uncommitted. Toolchain: uv 0.13.7, CPython 3.12.16 (provisioned by uv), gitleaks 8.30.1, pytest 9.2.0, ruff 0.17.4, pip-audit 2.10.1, pre-commit 4.7.0. "Fresh clone" means this: the uncommitted G01 files were committed in a scratch copy of the repository, pushed to a scratch bare remote, and cloned again from it.
+
+Acceptance:
+- A1: `local, pass`. Fresh clone: `make check` exit 0; `uv run python -c "import truelift"` printed `0.0.1`.
+- A2: `offline, pass`. `uv run pytest tests/test_guard.py`: 34 passed, 1 skipped (the private test, A4).
+  - The guard exits 1 on staged fixtures for each case: `private/`, `.ipynb` (also in upper case), `.pdf`, a `.csv` outside `data/sample/`, and the truth prefix in a file not on the allowlist (also in lower case). It also exits 1 on each of the four key patterns.
+  - It exits 0 for a clean stage, for `data/sample/*.csv`, for the two allowlisted files and for `tests/private/`.
+  - Near misses pass: `risk-adjusted-…` and `FAQ.…`.
+  - Output never contains the key or the prefix (tested).
+  - On the real tree, `--tree` exits 0.
+  - In a scratch clone, `pre-commit` blocked a commit of `private/a.txt`: guard hook exit 1, commit refused. That is `local, pass`.
+- A3: `local, pass` and `live, pass`. GitHub Actions run 42190724189 on commit 2b341af (push, 2026-11-06): both jobs succeeded. In that run, `guard --tree` was clean (44 files), `guard --history` was clean (108 blobs) and gitleaks scanned 12 commits with no leaks found.
+  - `.github/workflows/ci.yml` runs on every push and pull request. The `confidentiality` job uses `fetch-depth: 0` and runs `guard --tree`, `guard --history`, then gitleaks 8.30.1 (pinned, sha256-verified) `git --log-opts=--all`.
+  - Current history is clean: `guard --history` reported "clean (82 blobs)". `gitleaks git --log-opts=--all` found no leaks across 11 commits. The fresh clone with G01 committed was also clean: 102 blobs, gitleaks no leaks.
+  - The custom gitleaks rules caught all four fake keys. The near-miss file passed. The pre-commit gitleaks hook applied the custom `truelift-google-aq-key` rule.
+- A4: `offline, pass`. `uv run pytest -m private -rs`: 1 collected, 1 skipped, "private materials absent"; `private/benchmark.yaml` is absent here.
+- A5: `local, pass`.
+  - `uv.lock` is created; it is committed with this change.
+  - `make check` runs `uv export --locked` → `pip-audit --disable-pip --require-hashes` with the result "No known vulnerabilities found". It needs network.
+  - pip-audit has no severity filter. It fails on every known vulnerability, which covers "high".
+- A6: `local, pass`.
+  - `make dist` built the sdist and wheel. `guard --dist` reported "clean (16 package members)". The sdist allowlist is `src/truelift`, `tests` and `scripts/guard_public.py`, plus the hatch defaults (README, LICENSE, NOTICE, pyproject, .gitignore).
+  - The content check exits 1 for wheel and sdist fixtures holding `private/…`, a `.csv` outside `data/sample/`, an `.ipynb` or a `.pdf` (`offline, pass`).
+
+Contracts and security rules:
+- C13: evidenced, live; G01/A1–A6. A3 includes CI run 42190724189.
+- SB15: evidenced, local; A5 (supply chain, Minimal). The lockfile is committed, `--locked` is on every `uv run`, and the audit runs in `make check`. CI actions are pinned to commit SHAs and the gitleaks binary is checksum-verified.
+- SB16: evidenced, local; A2 (offline) and A3 (local) (secrets, Build). The guard checks the four key patterns, and gitleaks runs its default rules plus the four custom ones.
+
+Companion skills: none (`companion_skills: []`).
+Specialists: `adk-release-engineering` 2026.10.28 is primary, and `adk-tool-auth-and-secrets` 2026.10.28 supports. The two versions match.
+
+Rulings:
+- R1. The guard stores the truth prefix base64-encoded, so the literal is nowhere in the repository, not even in the guard. D13 allowed the literal in the guard; this is stricter. G06's `forbidden.py` may import `TRUTH_PREFIX` from the guard or keep its own literal, since it is allowlisted. Cost if wrong: none to the contract.
+- R2. The prefix matches case-insensitively on its stem, without the trailing separator. This is stricter, and a false positive is possible but unlikely.
+- R3. `--tree` scans tracked files plus untracked files that are not ignored, so `make check` catches a new file before it is staged. `--history` scans every blob reachable from any ref.
+- R4. Only the top-level `private/` is denied. `tests/private/` (plan layout) is allowed.
+- R5. `requires-python = ">=3.12,<3.13"` matches the pinned release unit. G23 widens it if needed.
+- R6. `make e2e` runs `pytest -m e2e`. It exits 5 ("no tests ran") until G20 adds tests, so it never reports a pass that did not happen.
+- R7. `scripts/tickets_to_github.py` already existed and is excluded from ruff (`extend-exclude`). Lint it in its own change.
+- R8. pip-audit is stricter than "high" (see A5). Any ignore must be a named `--ignore-vuln` with a reason.
+
+Controls left out at this profile: severity-based audit thresholds, SBOM generation, signed releases and wheel-content checks on PyPI upload. No goal publishes to PyPI. The release ticket adds these if publishing is ever authorised.
+
+Resources that charge: none.
+
+Human effort still owed (about 0.5–1 h):
+- Review the diff. Look especially at the `scripts/guard_public.py` rules and the `.gitleaks.toml` regexes.
+- In GitHub branch protection for `main`, mark `ci / confidentiality guard and gitleaks (full history)` and `ci / make check and package content check` as required checks. C13 calls the CI job "required", which is a repository setting only an admin can change.
+- Give `CODEOWNERS` Thao's GitHub handle: replace `@RuslanKhis` on the `/rules/`, `/templates/` and `/src/truelift/causal/` lines (D18). The only collaborator today is `RuslanKhis`.
+- Each developer runs `make dev` once to install the hooks. The first gitleaks hook run downloads a Go toolchain, which takes a few minutes.
+
+actual: not reported
 
 ## Run this ticket
 
