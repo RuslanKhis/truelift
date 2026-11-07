@@ -2213,6 +2213,8 @@ dependencies = [
     { name = "lightgbm" },
     { name = "litellm" },
     { name = "python-multipart" },
+    { name = "pyyaml" },
+    { name = "sqlalchemy" },
     { name = "uvicorn" },
     { name = "xgboost" },
 ]
@@ -2235,6 +2237,8 @@ requires-dist = [
     { name = "lightgbm", specifier = ">=4.7.0" },
     { name = "litellm", specifier = ">=1.84,<1.106.3" },
     { name = "python-multipart", specifier = ">=0.0.20" },
+    { name = "pyyaml", specifier = ">=6.0.3" },
+    { name = "sqlalchemy", specifier = ">=2.1.8" },
     { name = "uvicorn", specifier = ">=0.30" },
     { name = "xgboost", specifier = ">=3.4.1" },
 ]

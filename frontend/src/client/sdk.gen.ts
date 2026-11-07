@@ -2,7 +2,7 @@
 
 import { type Client, type ClientMeta, formDataBodySerializer, type Options as Options2, type RequestResult, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { DagConfirmDagData, DagConfirmDagErrors, DagConfirmDagResponses, DagGetDagData, DagGetDagErrors, DagGetDagResponses, DagGetIdentificationData, DagGetIdentificationErrors, DagGetIdentificationResponses, DagPutEdgeOpinionData, DagPutEdgeOpinionErrors, DagPutEdgeOpinionResponses, HealthHealthData, HealthHealthResponses, IntakeConfirmMappingData, IntakeConfirmMappingErrors, IntakeConfirmMappingResponses, IntakeGetMappingData, IntakeGetMappingErrors, IntakeGetMappingResponses, IntakeGetProfileData, IntakeGetProfileErrors, IntakeGetProfileResponses, IntakePutMappingData, IntakePutMappingErrors, IntakePutMappingResponses, IntakeUploadDataData, IntakeUploadDataErrors, IntakeUploadDataResponses, ProjectsCreateProjectData, ProjectsCreateProjectErrors, ProjectsCreateProjectResponses, ProjectsDecideProposalData, ProjectsDecideProposalErrors, ProjectsDecideProposalResponses, ProjectsGetProjectData, ProjectsGetProjectErrors, ProjectsGetProjectResponses, ProjectsListProjectsData, ProjectsListProjectsErrors, ProjectsListProjectsResponses, ProjectsListProposalsData, ProjectsListProposalsErrors, ProjectsListProposalsResponses, ResultsGetResultsData, ResultsGetResultsErrors, ResultsGetResultsResponses, RunsCancelRunData, RunsCancelRunErrors, RunsCancelRunResponses, RunsGetRunData, RunsGetRunErrors, RunsGetRunResponses, RunsListRunsData, RunsListRunsErrors, RunsListRunsResponses, RunsStartRunData, RunsStartRunErrors, RunsStartRunResponses, SetupGetDisclosureData, SetupGetDisclosureErrors, SetupGetDisclosureResponses, SetupGetLedgerData, SetupGetLedgerErrors, SetupGetLedgerResponses, SetupGetSetupData, SetupGetSetupErrors, SetupGetSetupResponses, SetupGetUsageData, SetupGetUsageErrors, SetupGetUsageResponses, SetupPostConsentData, SetupPostConsentErrors, SetupPostConsentResponses, SetupPutApiKeyData, SetupPutApiKeyErrors, SetupPutApiKeyResponses, SetupPutBudgetData, SetupPutBudgetErrors, SetupPutBudgetResponses } from './types.gen';
+import type { DagConfirmDagData, DagConfirmDagErrors, DagConfirmDagResponses, DagGetDagData, DagGetDagErrors, DagGetDagResponses, DagGetIdentificationData, DagGetIdentificationErrors, DagGetIdentificationResponses, DagPutEdgeOpinionData, DagPutEdgeOpinionErrors, DagPutEdgeOpinionResponses, HealthHealthData, HealthHealthResponses, IntakeConfirmMappingData, IntakeConfirmMappingErrors, IntakeConfirmMappingResponses, IntakeGetMappingData, IntakeGetMappingErrors, IntakeGetMappingResponses, IntakeGetProfileData, IntakeGetProfileErrors, IntakeGetProfileResponses, IntakePutMappingData, IntakePutMappingErrors, IntakePutMappingResponses, IntakeUploadDataData, IntakeUploadDataErrors, IntakeUploadDataResponses, ProjectsAcceptProposalsData, ProjectsAcceptProposalsErrors, ProjectsAcceptProposalsResponses, ProjectsCreateProjectData, ProjectsCreateProjectErrors, ProjectsCreateProjectResponses, ProjectsDecideProposalData, ProjectsDecideProposalErrors, ProjectsDecideProposalResponses, ProjectsGetProjectData, ProjectsGetProjectErrors, ProjectsGetProjectResponses, ProjectsListProjectsData, ProjectsListProjectsErrors, ProjectsListProjectsResponses, ProjectsListProposalsData, ProjectsListProposalsErrors, ProjectsListProposalsResponses, ResultsGetResultsData, ResultsGetResultsErrors, ResultsGetResultsResponses, RunsCancelRunData, RunsCancelRunErrors, RunsCancelRunResponses, RunsGetRunData, RunsGetRunErrors, RunsGetRunResponses, RunsListRunsData, RunsListRunsErrors, RunsListRunsResponses, RunsStartRunData, RunsStartRunErrors, RunsStartRunResponses, SetupGetDisclosureData, SetupGetDisclosureErrors, SetupGetDisclosureResponses, SetupGetLedgerData, SetupGetLedgerErrors, SetupGetLedgerResponses, SetupGetSetupData, SetupGetSetupErrors, SetupGetSetupResponses, SetupGetUsageData, SetupGetUsageErrors, SetupGetUsageResponses, SetupPostConsentData, SetupPostConsentErrors, SetupPostConsentResponses, SetupPutApiKeyData, SetupPutApiKeyErrors, SetupPutApiKeyResponses, SetupPutBudgetData, SetupPutBudgetErrors, SetupPutBudgetResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -25,6 +25,9 @@ export const projectsListProjects = <ThrowOnError extends boolean = false>(optio
 
 /**
  * Create Project
+ *
+ * Lay out the project folder (knowledge files, ``dag/``, ``mapping/``, ``proposals/``,
+ * ``runs/``) and add it to the index.
  */
 export const projectsCreateProject = <ThrowOnError extends boolean = false>(options: Options<ProjectsCreateProjectData, ThrowOnError>): RequestResult<ProjectsCreateProjectResponses, ProjectsCreateProjectErrors, ThrowOnError> => (options.client ?? client).post<ProjectsCreateProjectResponses, ProjectsCreateProjectErrors, ThrowOnError>({
     url: '/api/projects',
@@ -159,6 +162,21 @@ export const intakeConfirmMapping = <ThrowOnError extends boolean = false>(optio
  * List Proposals
  */
 export const projectsListProposals = <ThrowOnError extends boolean = false>(options: Options<ProjectsListProposalsData, ThrowOnError>): RequestResult<ProjectsListProposalsResponses, ProjectsListProposalsErrors, ThrowOnError> => (options.client ?? client).get<ProjectsListProposalsResponses, ProjectsListProposalsErrors, ThrowOnError>({ url: '/api/projects/{project_id}/proposals', ...options });
+
+/**
+ * Accept Proposals
+ *
+ * Accept several proposals: all are applied or none. A contradiction refuses the batch
+ * (409 ``contradiction_in_batch``); decide it on its own.
+ */
+export const projectsAcceptProposals = <ThrowOnError extends boolean = false>(options: Options<ProjectsAcceptProposalsData, ThrowOnError>): RequestResult<ProjectsAcceptProposalsResponses, ProjectsAcceptProposalsErrors, ThrowOnError> => (options.client ?? client).post<ProjectsAcceptProposalsResponses, ProjectsAcceptProposalsErrors, ThrowOnError>({
+    url: '/api/projects/{project_id}/proposals/accept',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Decide Proposal

@@ -30,6 +30,9 @@ def make_settings(tmp_path: Path, **overrides: object) -> Settings:
         "launch_token": TOKEN,
         "web_dir": tmp_path / "web",
         "fake_stream_delay_s": 0.0,
+        # Never the user's home folder (G08).
+        "projects_dir": tmp_path / "projects",
+        "state_dir": tmp_path / "state",
     }
     values.update(overrides)
     return Settings(**values)  # type: ignore[arg-type]

@@ -1127,6 +1127,34 @@
         "title": "Proposal",
         "type": "object"
       },
+      "ProposalBatchIn": {
+        "additionalProperties": false,
+        "description": "Accept several proposals at once: all are applied or none (409 on a contradiction).",
+        "properties": {
+          "knowledge_version": {
+            "description": "A stale knowledge version returns 409.",
+            "minimum": 0.0,
+            "title": "Knowledge Version",
+            "type": "integer"
+          },
+          "proposal_ids": {
+            "items": {
+              "pattern": "^P[0-9]{1,6}$",
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Proposal Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "proposal_ids",
+          "knowledge_version"
+        ],
+        "title": "ProposalBatchIn",
+        "type": "object"
+      },
       "ProposalCreated": {
         "properties": {
           "proposal": {
@@ -1167,6 +1195,12 @@
             "minimum": 0.0,
             "title": "Knowledge Version",
             "type": "integer"
+          },
+          "resolves_contradiction": {
+            "default": false,
+            "description": "Accepting a proposal marked `contradiction` replaces a confirmed fact, so it needs this set to true: the user chose the new answer for this fact. Otherwise 409 `contradiction_choice_needed`. Rejecting keeps the confirmed fact and needs nothing.",
+            "title": "Resolves Contradiction",
+            "type": "boolean"
           }
         },
         "required": [
@@ -1967,6 +2001,7 @@
         ]
       },
       "post": {
+        "description": "Lay out the project folder (knowledge files, ``dag/``, ``mapping/``, ``proposals/``,\n``runs/``) and add it to the index.",
         "operationId": "projects-create_project",
         "requestBody": {
           "content": {
@@ -3461,20 +3496,11 @@
         ]
       }
     },
-    "/api/projects/{project_id}/proposals/{proposal_id}/decision": {
+    "/api/projects/{project_id}/proposals/accept": {
       "post": {
-        "operationId": "projects-decide_proposal",
+        "description": "Accept several proposals: all are applied or none. A contradiction refuses the batch\n(409 ``contradiction_in_batch``); decide it on its own.",
+        "operationId": "projects-accept_proposals",
         "parameters": [
-          {
-            "in": "path",
-            "name": "proposal_id",
-            "required": true,
-            "schema": {
-              "pattern": "^P[0-9]{1,6}$",
-              "title": "Proposal Id",
-              "type": "string"
-            }
-          },
           {
             "in": "path",
             "name": "project_id",
@@ -3482,6 +3508,123 @@
             "schema": {
               "pattern": "^[a-z0-9][a-z0-9-]{0,62}$",
               "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProposalBatchIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Proposal"
+                  },
+                  "title": "Response Projects-Accept Proposals",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Open truelift from the link the truelift command printed."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This request is not allowed."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Not found."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "This conflicts with the current state. Reload and try again."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Some fields are not valid."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Something went wrong. Quote the request ID if you report it."
+          }
+        },
+        "summary": "Accept Proposals",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/projects/{project_id}/proposals/{proposal_id}/decision": {
+      "post": {
+        "operationId": "projects-decide_proposal",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z0-9][a-z0-9-]{0,62}$",
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "proposal_id",
+            "required": true,
+            "schema": {
+              "pattern": "^P[0-9]{1,6}$",
+              "title": "Proposal Id",
               "type": "string"
             }
           }

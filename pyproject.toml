@@ -21,6 +21,8 @@ dependencies = [
     "lightgbm>=4.7.0",
     "litellm>=1.84,<1.106.3",
     "python-multipart>=0.0.20",
+    "pyyaml>=6.0.3",
+    "sqlalchemy>=2.1.8",
     "uvicorn>=0.30",
     "xgboost>=3.4.1",
 ]

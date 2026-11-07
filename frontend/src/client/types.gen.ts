@@ -698,6 +698,24 @@ export type Proposal = {
 };
 
 /**
+ * ProposalBatchIn
+ *
+ * Accept several proposals at once: all are applied or none (409 on a contradiction).
+ */
+export type ProposalBatchIn = {
+    /**
+     * Knowledge Version
+     *
+     * A stale knowledge version returns 409.
+     */
+    knowledge_version: number;
+    /**
+     * Proposal Ids
+     */
+    proposal_ids: Array<string>;
+};
+
+/**
  * ProposalCreated
  */
 export type ProposalCreated = {
@@ -727,6 +745,12 @@ export type ProposalDecisionIn = {
      * A stale knowledge version returns 409.
      */
     knowledge_version: number;
+    /**
+     * Resolves Contradiction
+     *
+     * Accepting a proposal marked `contradiction` replaces a confirmed fact, so it needs this set to true: the user chose the new answer for this fact. Otherwise 409 `contradiction_choice_needed`. Rejecting keeps the confirmed fact and needs nothing.
+     */
+    resolves_contradiction?: boolean;
 };
 
 /**
@@ -2001,17 +2025,69 @@ export type ProjectsListProposalsResponses = {
 
 export type ProjectsListProposalsResponse = ProjectsListProposalsResponses[keyof ProjectsListProposalsResponses];
 
-export type ProjectsDecideProposalData = {
-    body: ProposalDecisionIn;
+export type ProjectsAcceptProposalsData = {
+    body: ProposalBatchIn;
     path: {
-        /**
-         * Proposal Id
-         */
-        proposal_id: string;
         /**
          * Project Id
          */
         project_id: string;
+    };
+    query?: never;
+    url: '/api/projects/{project_id}/proposals/accept';
+};
+
+export type ProjectsAcceptProposalsErrors = {
+    /**
+     * Open truelift from the link the truelift command printed.
+     */
+    401: ErrorBody;
+    /**
+     * This request is not allowed.
+     */
+    403: ErrorBody;
+    /**
+     * Not found.
+     */
+    404: ErrorBody;
+    /**
+     * This conflicts with the current state. Reload and try again.
+     */
+    409: ErrorBody;
+    /**
+     * Some fields are not valid.
+     */
+    422: ErrorBody;
+    /**
+     * Something went wrong. Quote the request ID if you report it.
+     */
+    500: ErrorBody;
+};
+
+export type ProjectsAcceptProposalsError = ProjectsAcceptProposalsErrors[keyof ProjectsAcceptProposalsErrors];
+
+export type ProjectsAcceptProposalsResponses = {
+    /**
+     * Response Projects-Accept Proposals
+     *
+     * Successful Response
+     */
+    200: Array<Proposal>;
+};
+
+export type ProjectsAcceptProposalsResponse = ProjectsAcceptProposalsResponses[keyof ProjectsAcceptProposalsResponses];
+
+export type ProjectsDecideProposalData = {
+    body: ProposalDecisionIn;
+    path: {
+        /**
+         * Project Id
+         */
+        project_id: string;
+        /**
+         * Proposal Id
+         */
+        proposal_id: string;
     };
     query?: never;
     url: '/api/projects/{project_id}/proposals/{proposal_id}/decision';

@@ -21,6 +21,16 @@ MIN_TOKEN_LENGTH = 32
 _WEB_DIR = Path(__file__).resolve().parent.parent / "web"
 
 
+def _default_projects_dir() -> Path:
+    # Design §5: the user's projects live in ~/truelift/projects/<name>/ (D1).
+    return Path.home() / "truelift" / "projects"
+
+
+def _default_state_dir() -> Path:
+    # Design §5: ~/.truelift/state.db holds the app's operational state (D1, D21).
+    return Path.home() / ".truelift"
+
+
 def _env_flag(name: str) -> bool:
     return os.environ.get(name, "").strip() == "1"
 
@@ -41,6 +51,11 @@ class Settings:
     max_upload_bytes: int = DEFAULT_MAX_UPLOAD_BYTES
     # Seconds between replayed agent-stream events (fake stream only; tests use 0).
     fake_stream_delay_s: float = 0.04
+    # Project folders (the authority, D1) and state.db. Nothing is created until first use.
+    projects_dir: Path = field(default_factory=_default_projects_dir)
+    state_dir: Path = field(default_factory=_default_state_dir)
+    # How long a state.db writer waits for another writer before failing with a generic 500 (A9).
+    db_busy_timeout_s: float = 5.0
 
     def __post_init__(self) -> None:
         if not 0 < self.port < 65536:
@@ -60,4 +75,9 @@ class Settings:
         dev = _env_flag("TRUELIFT_DEV")
         raw = os.environ.get("TRUELIFT_DEV_ORIGINS", "")
         dev_origins = tuple(o.strip() for o in raw.split(",") if o.strip()) if dev else ()
-        return cls(port=port, launch_token=launch_token, dev=dev, dev_origins=dev_origins)
+        paths: dict[str, Path] = {}
+        if projects := os.environ.get("TRUELIFT_PROJECTS_DIR", "").strip():
+            paths["projects_dir"] = Path(projects).expanduser()
+        if state := os.environ.get("TRUELIFT_STATE_DIR", "").strip():
+            paths["state_dir"] = Path(state).expanduser()
+        return cls(port=port, launch_token=launch_token, dev=dev, dev_origins=dev_origins, **paths)
