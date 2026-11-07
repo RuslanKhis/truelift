@@ -7,7 +7,7 @@ primary_skill: adk-workflow-design
 supporting_skills: []
 docs: [adk-workflow-design/references/validation.md]
 blocked_by: [G03, G05]
-touches: [src/truelift/causal/, tests/causal/]
+touches: [.github/workflows/ci.yml, src/truelift/causal/, tests/causal/]
 parallel_safe: no
 contracts: [C2, C3, C4]
 companion_skills: []
@@ -23,9 +23,9 @@ estimate:
   review_and_verify: 1-2
   total: 5-8
   handoff: 0.5
-  calendar_waits: none
+  calendar_waits: Thao's code-owner review (D18)
 owner: Ruslan            # suggested owner; anyone may pick this ticket
-status: ready
+status: proposed
 ---
 
 # G06 Causal core: DAG, identification and config compiler

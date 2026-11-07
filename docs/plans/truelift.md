@@ -1,26 +1,26 @@
 # Implementation plan: truelift
 
-Status: draft. Ready goals have been identified, and the cut line was confirmed by Ruslan on 2026-11-05. **The plan has not been independently reviewed** (see *Resume here*).
+Status: draft. Ready goals have been identified, and the cut line was confirmed by Ruslan on 2026-11-05. Independently reviewed on 2026-11-07; every finding is settled in *Changes after the independent review*.
 Architecture: [docs/architecture/truelift.md](../architecture/truelift.md). Decisions (D), contracts (C) and requirements (R) are defined there and only referred to here.
 Continuation source of truth: the tickets in `docs/tickets/truelift/` for status and evidence; this plan for the schedule and phases.
 
 ## Summary for the reader
 
 - **Profile and phase 1.** MVP or pilot, self-hosted open source (design §3). Phase 1 is milestone **M1**: the full loop on `localhost`, run from source. That means interview → DAG edge cards → identification → compiled config → local pipeline run → grounded explanation. M1 passes the synthetic benchmark tier in CI and at the milestone, and the hackathon tier locally (C14). It ends with a demo and business and technical presentations to the hackathon organisers, whose feedback (W1) gates phase 2.
-- **Effort and finish.** Phase 1 needs **98.5–161 human hours** across 22 goals and one wait: Ruslan 39–67.5 h, Thao 31–51 h, Chloe 28.5–42.5 h.
-  - At about 2.5 h/week per person with a 25% reserve, the schedule checker gives a finish of **134–231 working days**, roughly June to October 2027.
+- **Effort and finish.** Phase 1 needs **101.5–165 human hours** across 23 goals and one wait (G01 at its actual 1 h): Ruslan 41–70 h, Thao 31–51 h, Chloe 29.5–44 h.
+  - At about 2.75 h/week per person (0.55 h per working day, confirmed by Ruslan on 2026-11-07) with a 25% reserve, the schedule checker gives a finish of **128–220 working days**. At 2.5 h/week it would be 139–240 and would not fit.
   - The plan window is **235 working days**. Every load and the finish range fit, and the checker exits 0.
   - Two internal checkpoints show progress early:
-    - **CP1**, the deterministic synthetic benchmark green (G10), at 67–112 days.
-    - **CP2**, the agent-built benchmark green headless (G18), at 111–188 days.
-  - At 3 h/week the finish would be 113–196 days.
+    - **CP1**, the deterministic synthetic benchmark green (G10), at 65–130 days.
+    - **CP2**, the agent-built benchmark green headless (G18), at 99–170 days.
+  - At 3 h/week the finish would be 118–203 days.
 - **Largest risks.**
-  1. Ruslan's serial agent and backend chain is the critical path. Scope cuts save only about 10%, and moving goals to Chloe or Thao made the finish later (143–243 days). Mitigation: protect Ruslan's hours, and keep his goals free of review work for others.
-  2. The hackathon ±25% target may be out of reach with any config: the expert estimate was −34% off, and there are only 6 clusters. Mitigation: C14 records a shortfall as a finding, and G19 diagnoses it.
+  1. The critical path is a three-person chain (G05 and G10 Thao; G06, G31 and G09 Ruslan; G16, G17, G20 and G21 Chloe), with about 2 days of slack. Mitigation: protect those goals' hours, keep review handoffs short (recorded as waits on G06, G12 and G14), and apply the cut ladder at the first overrun.
+  2. The hackathon ±25% target may be out of reach with any config: the expert estimate was −34% off, and the panel has only a few region clusters. Mitigation: C14 records a shortfall as a finding, and G19 diagnoses it.
   3. doubleml-pipeline is young: three releases in eight days. Mitigation: exact pin, plus a benchmark re-run on every upgrade (C9, G18).
 - **Decisions needed from you.**
   - Confirm that Chloe owns the business presentation (G21), and who presents it.
-- **Next prompt:** `/adk-engineer Carry out G01 from docs/plans/truelift.md.`
+- **Next prompt:** take a ready ticket (G02–G05) with "what can I grab?".
 
 ## Destination and constraints
 
@@ -78,17 +78,17 @@ Owners are **suggestions** used for the schedule check, not assignments: anyone 
 
 ### Capacity and cut line
 
-Checker results for phase 1, run on 2026-11-05 with 0.5 h/day per person and 25% reserve:
+Checker results for phase 1, run on 2026-11-05 with 0.5 h/day per person and 25% reserve. The independent review (2026-11-07) corrected four rows and added the missing work. After that the full M1 needs 0.55 h/day per person: **128–220 working days** (exit 0). The rows below are kept for the record; cuts and moves are now measured against that baseline.
 
 | Scenario | Finish (working days) | Result |
 | --- | --- | --- |
 | **Full M1, as planned (confirmed)** | **134–231** | Fits a 235-day window (exit 0). Does not fit 115 days (exit 1). |
 | CP1 only (G01, G03–G06, G08–G10) | 67–112 | Checkpoint, not a cut |
 | CP2 only (adds G02, G07, G11–G14, G18) | 111–188 | Checkpoint, not a cut |
-| Cut options 1–3 below applied | 134–231 | No gain: Ruslan's chain is unchanged |
-| Cut options plus Chloe takes G02 and Thao takes G03 | 143–243 | Worse: Chloe's UI chain starts later |
-| Cut options plus a template-only explainer | 125–209 | About 10% gain for losing the LLM narrative. Rejected. |
-| UI and presentations moved to phase 2 (headless M1) | 111–188 | About 20 days gain for a much weaker CMO demo. Rejected. |
+| Cut options 1–3 below applied | 130–225 | Gain of 4–6 days (corrected by the 2026-11-07 review) |
+| Cut options plus Chloe takes G02 and Thao takes G03 | 135–233 | Worse than cuts alone: Chloe's UI chain starts later (re-modelled 2026-11-07) |
+| Cut options plus a template-only explainer | 122–209 | About 10% gain for losing the LLM narrative. Rejected. |
+| UI and presentations moved to phase 2 (headless M1) | 111–188 | 23–43 days gain for a much weaker CMO demo. Rejected. |
 | Full M1 at 3 h/week each | 113–196 | The real lever, if hours can rise |
 
 **Cut line (confirmed by Ruslan, 2026-11-05):** G01–G22 and W1 stay in M1, with a 235-day window and checkpoints CP1 and CP2. If work runs high, these items move to phase 2, in this order. Each step keeps a convincing end-to-end demo, but the checker shows they save hours more than days.
@@ -104,22 +104,54 @@ The order below keeps each finished goal useful if time runs out early. By G10, 
 
 ### Schedule check
 
-Command (Python 3.11.4, run 2026-11-05):
+Command (Python 3.12, rerun 2026-11-07 after the independent review):
 
 ```bash
 /Library/Frameworks/Python.framework/Versions/3.11/bin/python3.11 \
   ~/.claude/skills/adk-system-designer/scripts/check_schedule.py \
-  --plan docs/plans/truelift.md --design docs/architecture/truelift.md \
-  --days 235 --reserve 0.25 --person "Ruslan=0.5" --person "Thao=0.5" --person "Chloe=0.5"
+  --plan docs/plans/truelift.md --tickets docs/tickets/truelift --design docs/architecture/truelift.md \
+  --days 235 --reserve 0.25 --person "Ruslan=0.55" --person "Thao=0.55" --person "Chloe=0.55"
 ```
 
 Result:
-- 98.5–161 h of 264 h after reserve. Finish 134–231 working days. Exit 0.
-- Longest chain, low: G01 → G05 → G06 → G16 → G17 → G20 → G21 → W1 (102 days).
-- Longest chain, high: G01 → G05 → G06 → G09 → G10 → G17 → G20 → G21 → W1 (168 days).
+- 101.5–165 h of 290.81 h after reserve. Finish 127.58–220 working days. Exit 0.
+- Longest chain, low and high: G01 → G05 → G06 → G31 → G16 → G17 → G20 → G21 → W1 (99.81 and 158.43 days). The finish is set by load, chiefly Ruslan's 41–70 h, not by the chain.
+- At 0.5 h/day the same plan gives 139–240, which does not fit.
 - Contracts: 16/16 cited.
 - Coverage grid: every cell cites an acceptance item or gives an n/a reason.
 - Security rules: 17/25 cited; 8 are n/a or deferred with reasons.
+
+**Changes after the independent review (2026-11-07).** A reviewer in a fresh context checked prerequisites, settled mentions, claims and coverage, and returned 27 findings; Ruslan decided the four that needed a choice. Nothing was removed or weakened. Estimates rose by 3–4 h net: G31 is new at 2–4 h, and G08, G11 and G17 grew; G01 counts at its actual 1 h.
+
+| Finding | Settlement |
+| --- | --- |
+| Hidden dependencies: G07 needs G05, G06 and G08; G08 needs G02; G09 needs G04; G11 needs G06 and G08; G12 needs G04 | Added to `blocked_by` in the plan and the tickets; handoff hours added to G07 and G09 |
+| No goal built the DAG from confirmed facts, or the real DAG, identification and results routes | New goal **G31** (Ruslan, 2–4 h) after G06 and G08, feeding G13 and G16 |
+| G15 could not check real G07 behaviour against stubs | G15/A2–A4 now test the stub contract; G20/A1 checks real payloads and rejection reasons (Ruslan's choice) |
+| Cross-person reviews were not modelled | Waits of 1.33–2.67 days on G06 (Thao's review), G12 (Ruslan's phrasing check) and G14 (Thao's review) |
+| G06 needs G04's truth-sidecar format | G05 fixes `rules/truth_sidecar.yaml` (A6); G04 and G06 follow it; no new dependency |
+| With the missing work the plan no longer fitted at 2.5 h/week (237–241 days) | Capacity raised to about 2.75 h/week per person (Ruslan's choice): 128–220 days. The cut ladder stays as the fallback |
+| G19 sends hackathon data to the LLM | Allowed by Ruslan: disclosed categories under C8, never truth columns (R10 revised). No approval wait |
+| Private results in public notes (G03, G19, design §9) | G03's note uses the stand-in panel; G19 records counts and pass or shortfall; numbers stay in `private/` |
+| Dataset-identifying wording in public history | Accepted exception (Ruslan). The guard now denies an encoded list of identifying terms in the tree, staged files and packages (D13) |
+| "6 regions" and "6 clusters" left in the design and plan | Reworded to "a few regions" |
+| Missing UI: ledger page, budget view, "AI unavailable" and "AI paused" banners | G17/A6 and G15/A6 |
+| LLM grid: lost-response spend, other rejections and egress untested | G11/A9 (socket egress, LiteLLM cost map off), G11/A10 (400, safety block, context too long), G11/A11 (lost-response estimate) |
+| SQLite, disk and upload grid cells with wrong citations or n/a reasons | Re-cited: G08/A9 (database errors, concurrent writers), G08/A5 (disk full), G07/A1 (atomic upload, size cap), G03/A2 (RAM caps), G13/A4 (stored text) |
+| Action grid: partial apply and stale DAG confirmation cited the wrong items | G08/A8 (all-or-nothing batch) and G08/A7 (stale confirmation) |
+| Code-owner review not enforced; Thao the sole owner of her own paths | Ruslan added as second owner of `rules/` and `templates/`; G05/A5 now requires the branch-protection setting |
+| Checker command lacked `--tickets` | Fixed above |
+| Claims: Risk 1, the cut rows, the headless gain, CP1 and CP2 dates, R13 | Corrected from the checker and the reviewer's re-runs |
+| Documentation | G06–G22 ticket statuses set to `proposed`; G17 and G20–G22 "In:" filled; G06 touches `ci.yml`; G04/A7 tests the unobserved-confounder switch; G02/A7 keeps C15 (a double send would double model spend) |
+| Prerequisites without a goal | Listed under *Prerequisites outside the goals* below |
+
+**Prerequisites outside the goals** (owner in brackets):
+- Thao and Chloe accept their GitHub invitations before **2026-11-12**, when the invitations expire (Ruslan re-invites if needed). Until then Thao's CODEOWNERS lines are ignored.
+- Enable "Require review from Code Owners" on `main` once Thao has accepted (Ruslan; G05/A5).
+- LLM keys and live-spend authorisation for G03/A4, G11/A8, G13 and G18/A4, within the $20/month budget (Ruslan).
+- The private materials on the machine that runs G12/A3 and G19 (Ruslan, or Thao if she runs them).
+- 3–10 h of unattended compute for the full benchmark tiers (G10/A5, G18/A2), run outside the people's hours.
+- Booking the organisers' review session for W1 (Ruslan, once G21 and G22 are scheduled).
 
 **Changes at checkpoint 1 (2026-11-07, after G01):** all eight G01 rulings were accepted by Ruslan. No contract changed, no estimate moved, and nothing was removed or weakened.
 
@@ -147,9 +179,9 @@ No dependency, wait or review was removed.
 ```yaml
 - goal: G01
   phase: 1
-  hands_on: 1.5-3
-  review: 0.5-1
-  total: 2-4
+  hands_on: 0.75
+  review: 0.25
+  total: 1
   owner: Ruslan
   blocked_by: []
   calendar_waits: none
@@ -202,7 +234,7 @@ No dependency, wait or review was removed.
   handoff: 0.25
   contracts: [C14, C4, C3]
   security: []
-  mentions_only: [G12]
+  mentions_only: []
   type: implementation
   status: planned
 - goal: G05
@@ -217,7 +249,7 @@ No dependency, wait or review was removed.
   handoff: 0.25
   contracts: [C3, C2]
   security: []
-  mentions_only: []
+  mentions_only: [G04]
   type: implementation
   status: planned
 - goal: G06
@@ -227,8 +259,8 @@ No dependency, wait or review was removed.
   total: 5-8
   owner: Ruslan
   blocked_by: [G03, G05]
-  calendar_waits: none
-  wait_days: 0
+  calendar_waits: Thao's code-owner review (D18)
+  wait_days: 1.33-2.67
   handoff: 0.5
   contracts: [C2, C3, C4]
   security: []
@@ -241,10 +273,10 @@ No dependency, wait or review was removed.
   review: 1-1.5
   total: 4-6.5
   owner: Thao
-  blocked_by: [G01, G02]
+  blocked_by: [G01, G02, G05, G06, G08]
   calendar_waits: none
   wait_days: 0
-  handoff: 0.25
+  handoff: 0.5
   contracts: [C12, C3, C4, C8, C11]
   security: [SB11]
   mentions_only: []
@@ -252,11 +284,11 @@ No dependency, wait or review was removed.
   status: planned
 - goal: G08
   phase: 1
-  hands_on: 3-5
+  hands_on: 3.5-5.5
   review: 1-2
-  total: 4-7
+  total: 4.5-7.5
   owner: Ruslan
-  blocked_by: [G01]
+  blocked_by: [G01, G02]
   calendar_waits: none
   wait_days: 0
   handoff: 0
@@ -265,16 +297,31 @@ No dependency, wait or review was removed.
   mentions_only: []
   type: implementation
   status: planned
+- goal: G31
+  phase: 1
+  hands_on: 1.5-3
+  review: 0.5-1
+  total: 2-4
+  owner: Ruslan
+  blocked_by: [G06, G08]
+  calendar_waits: none
+  wait_days: 0
+  handoff: 0
+  contracts: [C1, C3]
+  security: []
+  mentions_only: [G14]
+  type: implementation
+  status: planned
 - goal: G09
   phase: 1
   hands_on: 4-6
   review: 1-2
   total: 5-8
   owner: Ruslan
-  blocked_by: [G06, G08]
+  blocked_by: [G04, G06, G08]
   calendar_waits: none
   wait_days: 0
-  handoff: 0
+  handoff: 0.25
   contracts: [C1, C9, C10, C14]
   security: [SB19]
   mentions_only: []
@@ -297,11 +344,11 @@ No dependency, wait or review was removed.
   status: planned
 - goal: G11
   phase: 1
-  hands_on: 3-5
+  hands_on: 3.5-6
   review: 1-2
-  total: 4-7
+  total: 4.5-8
   owner: Ruslan
-  blocked_by: [G02, G03]
+  blocked_by: [G02, G03, G06, G08]
   calendar_waits: none
   wait_days: 0
   handoff: 0
@@ -316,9 +363,9 @@ No dependency, wait or review was removed.
   review: 1-2
   total: 5-8
   owner: Thao
-  blocked_by: [G05]
-  calendar_waits: none
-  wait_days: 0
+  blocked_by: [G04, G05]
+  calendar_waits: Ruslan reads the question phrasing (manual check)
+  wait_days: 1.33-2.67
   handoff: 0
   contracts: [C3, C11, C14, C13]
   security: []
@@ -331,7 +378,7 @@ No dependency, wait or review was removed.
   review: 1.5-2.5
   total: 5.5-9.5
   owner: Ruslan
-  blocked_by: [G06, G07, G08, G11, G12]
+  blocked_by: [G06, G07, G08, G11, G12, G31]
   calendar_waits: none
   wait_days: 0
   handoff: 1
@@ -347,8 +394,8 @@ No dependency, wait or review was removed.
   total: 4-7
   owner: Ruslan
   blocked_by: [G10, G11]
-  calendar_waits: none
-  wait_days: 0
+  calendar_waits: Thao's review (G14/A5)
+  wait_days: 1.33-2.67
   handoff: 0.5
   contracts: [C5, C6]
   security: []
@@ -376,7 +423,7 @@ No dependency, wait or review was removed.
   review: 2-3
   total: 9-13
   owner: Chloe
-  blocked_by: [G15, G06, G08]
+  blocked_by: [G15, G06, G08, G31]
   calendar_waits: none
   wait_days: 0
   handoff: 0.5
@@ -387,9 +434,9 @@ No dependency, wait or review was removed.
   status: planned
 - goal: G17
   phase: 1
-  hands_on: 5-7
+  hands_on: 6-8.5
   review: 1-2
-  total: 6-9
+  total: 7-10.5
   owner: Chloe
   blocked_by: [G16, G09, G10]
   calendar_waits: none
@@ -591,23 +638,24 @@ G02 writes this table into `AGENTS.md` with the resolved pins; after that, this 
 
 | ID and goal | Phase | Type | Human hours | Depends on | Primary skill | State |
 | --- | --- | --- | --- | --- | --- | --- |
-| [G01](../tickets/truelift/G01-repo-foundation-and-confidentiality-guard.md) Repo foundation and confidentiality guard | 1 | implementation | 2–4 | — | `adk-release-engineering` | done |
-| [G02](../tickets/truelift/G02-api-skeleton-localhost-auth-stream-contract-and.md) API skeleton, localhost auth, stream contract, generated client | 1 | implementation | 3–5 | G01 | `adk-fastapi-backend` | proposed |
-| [G03](../tickets/truelift/G03-pipeline-feasibility-spike.md) Pipeline feasibility spike | 1 | discovery | 2.5–5 | G01 | `adk-engineer` | proposed |
-| [G04](../tickets/truelift/G04-synthetic-market-generator-and-truth.md) Synthetic market generator and truth | 1 | implementation | 6–10 | G01 | `adk-agent-evaluation` | proposed |
-| [G05](../tickets/truelift/G05-rules-dag-templates-and-golden-cases.md) Rules, DAG templates and golden cases | 1 | implementation | 5–8 | G01 | `adk-agent-evaluation` | proposed |
+| [G01](../tickets/truelift/G01-repo-foundation-and-confidentiality-guard.md) Repo foundation and confidentiality guard | 1 | implementation | 1 (actual; est. 2–4) | — | `adk-release-engineering` | done |
+| [G02](../tickets/truelift/G02-api-skeleton-localhost-auth-stream-contract-and.md) API skeleton, localhost auth, stream contract, generated client | 1 | implementation | 3–5 | G01 | `adk-fastapi-backend` | ready |
+| [G03](../tickets/truelift/G03-pipeline-feasibility-spike.md) Pipeline feasibility spike | 1 | discovery | 2.5–5 | G01 | `adk-engineer` | ready |
+| [G04](../tickets/truelift/G04-synthetic-market-generator-and-truth.md) Synthetic market generator and truth | 1 | implementation | 6–10 | G01 | `adk-agent-evaluation` | ready |
+| [G05](../tickets/truelift/G05-rules-dag-templates-and-golden-cases.md) Rules, DAG templates and golden cases | 1 | implementation | 5–8 | G01 | `adk-agent-evaluation` | ready |
 | [G06](../tickets/truelift/G06-causal-core-dag-identification-and-config-compil.md) Causal core: DAG, identification, compiler | 1 | implementation | 5–8 | G03, G05 | `adk-workflow-design` | proposed |
-| G07 Data intake, profiling and mapping validation | 1 | implementation | 4–6.5 | G01, G02 | `adk-fastapi-backend` | proposed |
-| [G08](../tickets/truelift/G08-project-store-knowledge-markdown-versions-and-sq.md) Project store: knowledge Markdown, versions, SQLite | 1 | implementation | 4–7 | G01 | `adk-memory-architecture` | proposed |
-| [G09](../tickets/truelift/G09-pipeline-worker-and-run-lifecycle.md) Pipeline worker and run lifecycle | 1 | implementation | 5–8 | G06, G08 | `adk-workflow-design` | proposed |
+| G07 Data intake, profiling and mapping validation | 1 | implementation | 4–6.5 | G02, G05, G06, G08 | `adk-fastapi-backend` | proposed |
+| [G08](../tickets/truelift/G08-project-store-knowledge-markdown-versions-and-sq.md) Project store: knowledge Markdown, versions, SQLite | 1 | implementation | 4.5–7.5 | G02 | `adk-memory-architecture` | proposed |
+| [G31](../tickets/truelift/G31-dag-builder-and-causal-routes.md) DAG builder and causal API routes (added by the 2026-11-07 review) | 1 | implementation | 2–4 | G06, G08 | `adk-workflow-design` | proposed |
+| [G09](../tickets/truelift/G09-pipeline-worker-and-run-lifecycle.md) Pipeline worker and run lifecycle | 1 | implementation | 5–8 | G04, G06, G08 | `adk-workflow-design` | proposed |
 | [G10](../tickets/truelift/G10-findings-digest-verdicts-scorer-and-deterministi.md) Findings digest, verdicts, scorer, deterministic synthetic tier | 1 | implementation | 4–7 | G04, G09 | `adk-agent-evaluation` | proposed |
-| [G11](../tickets/truelift/G11-model-gateway-keys-consent-payload-limits-and-bu.md) Model gateway: keys, consent, payload, budget | 1 | implementation | 4–7 | G02, G03 | `adk-operational-guardrails` | proposed |
-| [G12](../tickets/truelift/G12-question-bank-slot-catalogue-and-personas.md) Question bank, slot catalogue and personas | 1 | implementation | 5–8 | G05 | `adk-agent-instructions` | proposed |
-| [G13](../tickets/truelift/G13-interviewer-agent.md) Interviewer agent | 1 | implementation | 5.5–9.5 | G06, G07, G08, G11, G12 | `adk-workflow-design` | proposed |
+| [G11](../tickets/truelift/G11-model-gateway-keys-consent-payload-limits-and-bu.md) Model gateway: keys, consent, payload, budget | 1 | implementation | 4.5–8 | G02, G03, G06, G08 | `adk-operational-guardrails` | proposed |
+| [G12](../tickets/truelift/G12-question-bank-slot-catalogue-and-personas.md) Question bank, slot catalogue and personas | 1 | implementation | 5–8 | G04, G05 | `adk-agent-instructions` | proposed |
+| [G13](../tickets/truelift/G13-interviewer-agent.md) Interviewer agent | 1 | implementation | 5.5–9.5 | G06, G07, G08, G11, G12, G31 | `adk-workflow-design` | proposed |
 | [G14](../tickets/truelift/G14-explainer-agent-with-grounded-narrative.md) Explainer agent with grounded narrative | 1 | implementation | 4–7 | G10, G11 | `adk-model-and-output-contracts` | proposed |
 | [G15](../tickets/truelift/G15-ui-shell-setup-and-consent-upload-and-mapping.md) UI: shell, setup and consent, upload and mapping | 1 | implementation | 6–9 | G02 | `adk-frontend-integration` | proposed |
-| [G16](../tickets/truelift/G16-ui-interview-chat-edge-cards-and-dag-graph.md) UI: interview chat, edge cards, DAG graph | 1 | implementation | 9–13 | G15, G06, G08 | `adk-frontend-integration` | proposed |
-| [G17](../tickets/truelift/G17-ui-run-progress-and-results.md) UI: run progress and results | 1 | implementation | 6–9 | G16, G09, G10 | `adk-frontend-integration` | proposed |
+| [G16](../tickets/truelift/G16-ui-interview-chat-edge-cards-and-dag-graph.md) UI: interview chat, edge cards, DAG graph | 1 | implementation | 9–13 | G15, G06, G08, G31 | `adk-frontend-integration` | proposed |
+| [G17](../tickets/truelift/G17-ui-run-progress-and-results.md) UI: run progress and results | 1 | implementation | 7–10.5 | G16, G09, G10 | `adk-frontend-integration` | proposed |
 | [G18](../tickets/truelift/G18-agent-driven-benchmark-and-ci-smoke.md) Agent-driven benchmark and CI smoke | 1 | implementation | 4–7 | G13, G10 | `adk-agent-evaluation` | proposed |
 | [G19](../tickets/truelift/G19-hackathon-tier-and-answer-key-comparison-local-o.md) Hackathon tier and answer-key comparison (local) | 1 | implementation | 4–6.5 | G18 | `adk-agent-evaluation` | proposed |
 | [G20](../tickets/truelift/G20-end-to-end-journey-and-demo-script.md) End-to-end journey and demo script | 1 | journey | 4–5.5 | G17, G18, G14, G13 | `adk-agent-evaluation` | proposed |
@@ -692,22 +740,10 @@ Detail follows certainty: these goals will be refined after W1. The steps from f
 ## Resume here
 
 - **Done:** G01 (PR #28, merged 2026-11-06; checkpoint 1 settled its rulings on 2026-11-07). Phase 1 base commit: `a10dfe5`.
-- **Ready now:** G02, G03, G04, G05 (in parallel) and G08 (after G02: both write `src/truelift/api/routes/projects.py`). Pick through the `pick-ticket` skill ("what can I grab?").
+- **Ready now:** G02, G03, G04 and G05, in parallel. G08 now waits for G02. Pick through the `pick-ticket` skill ("what can I grab?").
 - **Read first:** [docs/architecture/truelift.md](../architecture/truelift.md) §3–5, `AGENTS.md`, the ticket.
-- **Schedule check:** run 2026-11-05, exit 0 at 235 days; results in *Schedule check*. G01 finished inside its estimate (actual hours not reported).
-- **Independent review: not yet done.** This plan is for three people, so someone who did not write it should review it before G02 starts. Run the following in a fresh session (paths filled in), then settle each finding in this plan's change table:
-
-```text
-Review a delivery plan you did not write. Read, in full: the design docs/architecture/truelift.md and the plan docs/plans/truelift.md (no tickets directory). Do not edit them. Report findings only.
-The schedule block in the plan is the plan as it will run, and ~/.claude/skills/adk-system-designer/scripts/check_schedule.py computes its figures (run with Python 3.11+, --days 235 --reserve 0.25 --person Ruslan=0.5 --person Thao=0.5 --person Chloe=0.5 --design docs/architecture/truelift.md). Check:
-1. Prerequisites: for every acceptance item and grid cell, what must exist first (goal output, data, environment, access, private files, an approval); list any the schedule lacks.
-2. Settled mentions: for each mentions_only entry, ask both directions; list any that hide a real dependency or wait.
-3. Claims: rerun the helper with the stated parameters and run every remedy, fallback and comparative claim as a what-if on a copy; list each claim the output does not support.
-4. Coverage: list grid cells whose cited acceptance item does not test what the cell claims, and wrong n/a reasons.
-5. Effect: model each finding on a copy and give the finish range with it.
-Also check the confidentiality rule (C13): the two documents must not quote the hackathon notebook, deck or dataset beyond ROI 2.50 and 1.64 [-1.64, 4.92].
-Return a table: finding, evidence (file and text), effect on finish, suggested fix.
-```
+- **Schedule check:** rerun 2026-11-07 at 0.55 h/day: 128–220 days, exit 0; results in *Schedule check*. G01 took 1 h against a 2–4 h estimate.
+- **Independent review:** done 2026-11-07; findings settled in *Changes after the independent review*. Watch the invitation deadline (2026-11-12).
 - **Continuation prompt:** take a ready ticket with "what can I grab?", then run the prompt in its *Run this ticket* section.
 
 After that goal: `/adk-engineer Continue the next ready goal in docs/plans/truelift.md.`

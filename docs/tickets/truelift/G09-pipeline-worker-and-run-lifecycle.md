@@ -6,7 +6,7 @@ plan: docs/plans/truelift.md
 primary_skill: adk-workflow-design
 supporting_skills: [adk-operational-guardrails (one run at a time, caps)]
 docs: [adk-workflow-design/references/runtime.md]
-blocked_by: [G06, G08]
+blocked_by: [G04, G06, G08]
 touches: [src/truelift/worker/, src/truelift/api/routes/runs.py, tests/worker/]
 parallel_safe: no
 contracts: [C1, C9, C10, C14]
@@ -25,7 +25,7 @@ estimate:
   handoff: none
   calendar_waits: none
 owner: Ruslan            # suggested owner; anyone may pick this ticket
-status: ready
+status: proposed
 ---
 
 # G09 Pipeline worker and run lifecycle

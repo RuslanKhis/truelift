@@ -19,9 +19,9 @@ phase: 1
 type: implementation
 profile: MVP or pilot
 estimate:
-  hands_on: 1.5-3
-  review_and_verify: 0.5-1
-  total: 2-4
+  hands_on: 0.75          # actual; estimated 1.5-3
+  review_and_verify: 0.25 # actual; estimated 0.5-1
+  total: 1                # actual; estimated 2-4
   handoff: none
   calendar_waits: none
 owner: Ruslan            # suggested owner; anyone may pick this ticket
@@ -116,7 +116,7 @@ Human effort still owed (about 0.5–1 h):
 
 Done 2026-11-06: PR #28 merged by the owner (acceptance). Both CI jobs are required checks on `main`. CODEOWNERS names Thao (`@thithachthaotran`) for the D18 paths; it takes effect when Thao accepts the invitation.
 
-actual: not reported
+actual: 1 h (reported by Ruslan, 2026-11-07)
 
 ## Run this ticket
 

@@ -32,6 +32,7 @@ The repository is public. Its history and its packages must never contain:
 - `*.ipynb` or `*.pdf` files, or `*.csv` files outside `data/sample/`.
 - the hackathon truth-column prefix. Only `src/truelift/causal/forbidden.py` and `scripts/guard_public.py` may name it. The guard stores it encoded, so do not spell it out anywhere else: not in code, tests, docs, commit messages or PR text.
 - API keys: Google (`AIza…`, `AQ.…`), Anthropic (`sk-ant-…`) or OpenAI (`sk-…`).
+- terms that identify the source dataset: the hackathon's event and file names, or the earlier example market. The guard holds an encoded list. Use the neutral example (a pet-food brand in Germany) or the synthetic market in docs.
 
 Never quote, copy or paraphrase hackathon files, and never name them in public code. The brief allows only two numbers: true ROI ≈ 2.50 and the expert linear estimate of 1.64 [95% CI −1.64, 4.92].
 

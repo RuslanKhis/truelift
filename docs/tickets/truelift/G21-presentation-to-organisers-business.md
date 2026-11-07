@@ -25,7 +25,7 @@ estimate:
   handoff: 0.5
   calendar_waits: none
 owner: Chloe            # suggested owner; anyone may pick this ticket
-status: ready
+status: proposed
 ---
 
 # G21 Presentation to organisers: business
@@ -38,7 +38,7 @@ Owner note: Chloe prepares; Ruslan presenting is still to be confirmed.
 
 ## Scope
 
-- In: 
+- In: the business deck outline, spoken narrative, expected questions and a one-page decision memo for the organisers, built from plan evidence (G10, G18, G19, G20).
 - Route: see design
 - Depth: MVP depth per design §3; floor kept (no secrets, spend stop, pinned models).
 

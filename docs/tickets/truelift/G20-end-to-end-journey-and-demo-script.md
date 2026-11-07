@@ -25,7 +25,7 @@ estimate:
   handoff: 0.5
   calendar_waits: none
 owner: Chloe            # suggested owner; anyone may pick this ticket
-status: ready
+status: proposed
 ---
 
 # G20 End-to-end journey and demo script
@@ -36,7 +36,7 @@ The design §2 journey runs in a real browser against the real API, the agents a
 
 ## Scope
 
-- In: 
+- In: a Playwright journey over the real API on synthetic seed 1 with recorded model replies, the reattach and restart cases, and `scripts/demo/` reset and replay for the presentations.
 - Route: see design
 - Depth: MVP depth per design §3; floor kept (no secrets, spend stop, pinned models).
 
@@ -50,7 +50,7 @@ none
 
 ## Acceptance
 
-- [ ] A1 A Playwright journey on synthetic seed 1 covers setup → consent → upload → mapping → scripted interview → edge cards → identification → Quick run → results with a labelled narrative (C1, C5, C6, C8).
+- [ ] A1 A Playwright journey on synthetic seed 1 covers setup → consent (with the real payload built from the uploaded file) → upload (real G07 rejection reasons for a malformed file) → mapping → scripted interview → edge cards → identification → Quick run → results with a labelled narrative (C1, C5, C6, C8).
 - [ ] A2 A refresh during the run reattaches. Killing the backend shows `interrupted` after restart (C10).
 - [ ] A3 `make demo-reset && make demo-replay` reproduces the golden path with no live model calls. Screenshots come from the current build (floor)
 - [ ] A4 Every earlier goal's offline suite passes on the same commit (floor)

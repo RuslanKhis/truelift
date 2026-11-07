@@ -23,9 +23,9 @@ estimate:
   review_and_verify: 1-2
   total: 4-7
   handoff: 0.5
-  calendar_waits: none
+  calendar_waits: Thao's review (G14/A5)
 owner: Ruslan            # suggested owner; anyone may pick this ticket
-status: ready
+status: proposed
 ---
 
 # G14 Explainer agent with grounded narrative

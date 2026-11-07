@@ -6,7 +6,7 @@ plan: docs/plans/truelift.md
 primary_skill: adk-memory-architecture
 supporting_skills: []
 docs: [adk-memory-architecture/references/sessions-state.md, adk-memory-architecture/references/failure-recovery.md]
-blocked_by: [G01]
+blocked_by: [G01, G02]
 touches: [src/truelift/store/, src/truelift/api/routes/projects.py, tests/store/]
 parallel_safe: no
 contracts: [C11, C1]
@@ -19,9 +19,9 @@ phase: 1
 type: implementation
 profile: MVP or pilot
 estimate:
-  hands_on: 3-5
+  hands_on: 3.5-5.5
   review_and_verify: 1-2
-  total: 4-7
+  total: 4.5-7.5
   handoff: none
   calendar_waits: none
 owner: Ruslan            # suggested owner; anyone may pick this ticket
@@ -56,7 +56,9 @@ none
 - [ ] A4 A proposal that changes a confirmed fact is marked `contradiction` and needs an explicit choice per fact. A batch accept cannot apply it (C11).
 - [ ] A5 Writes are atomic (temp file plus rename). An injected failure leaves the previous version intact and returns an error (C11).
 - [ ] A6 DAG and mapping versions are written before the pointer moves. Changing a fact that a confirmed DAG cites marks that DAG `stale` (C11, C1).
-- [ ] A7 A write carrying a stale version number returns 409 and overwrites nothing (C11).
+- [ ] A7 A write carrying a stale version number returns 409 and overwrites nothing (C11). A DAG confirmation for a version that is no longer current is refused the same way (C1).
+- [ ] A8 Accepting a batch of proposals applies all of them or none: an injected failure on the third fact leaves the first two unapplied (C11).
+- [ ] A9 A database error or a locked `state.db` returns the generic 500 from G02; two concurrent writers to `state.db` serialise without loss (C11, SB13).
 
 Verification, automated: `uv run pytest tests/store` exits 0 (offline).
 Verification, manual: none.

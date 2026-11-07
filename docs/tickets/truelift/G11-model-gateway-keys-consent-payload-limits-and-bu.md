@@ -6,7 +6,7 @@ plan: docs/plans/truelift.md
 primary_skill: adk-operational-guardrails
 supporting_skills: [adk-tool-auth-and-secrets (key storage), adk-model-and-output-contracts (model IDs), protect-adk-sensitive-data (payload projection)]
 docs: [adk-operational-guardrails/references/token-budgets.md, adk-operational-guardrails/references/runtime-bounds.md]
-blocked_by: [G02, G03]
+blocked_by: [G02, G03, G06, G08]
 touches: [src/truelift/agents/gateway.py, src/truelift/models.yaml, src/truelift/api/routes/setup.py, tests/agents/test_gateway.py]
 parallel_safe: no
 contracts: [C7, C8, C15]
@@ -19,13 +19,13 @@ phase: 1
 type: implementation
 profile: MVP or pilot
 estimate:
-  hands_on: 3-5
+  hands_on: 3.5-6
   review_and_verify: 1-2
-  total: 4-7
+  total: 4.5-8
   handoff: none
   calendar_waits: none
 owner: Ruslan            # suggested owner; anyone may pick this ticket
-status: ready
+status: proposed
 ---
 
 # G11 Model gateway: keys, consent, payload limits and budget
@@ -58,6 +58,9 @@ none
 - [ ] A6 When the provider times out or is unavailable, the agent waits up to 60 s and then shows an "AI unavailable" banner. Deterministic flows continue (C15).
 - [ ] A7 When the keychain is unavailable or locked, the gateway falls back to the per-provider environment variable (`TRUELIFT_GEMINI_API_KEY`, `TRUELIFT_ANTHROPIC_API_KEY`) only, never to a file, with a clear message. A saved key is read back to verify it (C7).
 - [ ] A8 Native Gemini and Claude via `LiteLlm` both pass the same recorded-reply suite. IDs come from `models.yaml` (C8).
+- [ ] A9 A socket-level test shows the provider is the only network destination during a scripted session; LiteLLM's remote cost-map fetch is disabled (`LITELLM_LOCAL_MODEL_COST_MAP=True`) (C8).
+- [ ] A10 A 400, a safety block and a context-too-long reply each produce a plain message and no retry loop (C15).
+- [ ] A11 A lost response (timeout after send) charges an estimated token count to the budget, so a missing `usage_metadata` cannot bypass C15 (C15).
 
 Verification, automated: `uv run pytest tests/agents/test_gateway.py` exits 0 on recorded replies (offline).
 Verification, manual: none.

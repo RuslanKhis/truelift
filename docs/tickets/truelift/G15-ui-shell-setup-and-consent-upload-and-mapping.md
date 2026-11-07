@@ -25,7 +25,7 @@ estimate:
   handoff: 0.5
   calendar_waits: none
 owner: Chloe            # suggested owner; anyone may pick this ticket
-status: ready
+status: proposed
 ---
 
 # G15 UI: shell, setup and consent, upload and mapping
@@ -51,9 +51,10 @@ none
 ## Acceptance
 
 - [ ] A1 The app shell renders with the house theme and no default shadcn tokens. All calls go through the generated client (C12).
-- [ ] A2 Setup: choose a provider; the key is sent once to the backend and never kept in browser storage; the disclosure screen shows an example payload built from the user's own file; consent is recorded (C8, C7).
-- [ ] A3 Upload shows progress, and rejection reasons from G07 appear in plain language (C12).
-- [ ] A4 Mapping review shows each column's role and inline validation; Confirm stays disabled until every role is valid (C12).
+- [ ] A2 Setup: choose a provider; the key is sent once to the backend and never kept in browser storage; the disclosure screen renders the example payload the stub API returns for the uploaded file; consent is recorded (C8, C7). The real payload is checked in G20/A1.
+- [ ] A3 Upload shows progress, and every rejection reason in the stub API's error contract appears in plain language (C12). G20/A1 checks real G07 reasons.
+- [ ] A4 Mapping review shows each column's role and the stub's per-role validation errors inline; Confirm stays disabled until every role is valid (C12).
+- [ ] A6 The "AI unavailable" and "AI paused: budget reached" banners render from the stub stream's events, and the deterministic screens stay usable (C15).
 - [ ] A5 All server text renders as text (SB10).
 
 Verification, automated: `npm --prefix frontend run test` and `npm --prefix frontend run build` exit 0 against the G02 stub API (local).

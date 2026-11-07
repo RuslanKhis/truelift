@@ -56,6 +56,7 @@ none
 - [ ] A4 Every truth column is listed in `truth.yaml` and uses the `truth_` prefix (C4).
 - [ ] A5 `generate-bundle --seeds 1..20` produces the coverage set in under 2 minutes. Only seed 1 is committed, under 5 MB (C14).
 - [ ] A6 Region × week heterogeneity is documented: holiday weeks have higher ROI and the low season has negative ROI (C14).
+- [ ] A7 The unobserved-confounder switch works: with it on, the generator omits the confounder column and `truth.yaml` records it as hidden (C14, C3).
 
 Verification, automated: `uv run pytest tests/sample` exits 0 (offline).
 Verification, manual: none.

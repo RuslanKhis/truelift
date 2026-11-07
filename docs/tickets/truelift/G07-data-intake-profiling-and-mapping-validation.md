@@ -6,7 +6,7 @@ plan: docs/plans/truelift.md
 primary_skill: adk-fastapi-backend
 supporting_skills: []
 docs: [adk-fastapi-backend/references/validation.md]
-blocked_by: [G01, G02]
+blocked_by: [G01, G02, G05, G06, G08]
 touches: [src/truelift/intake/, src/truelift/api/routes/intake.py, tests/intake/]
 parallel_safe: no
 contracts: [C12, C3, C4, C8, C11]
@@ -25,7 +25,7 @@ estimate:
   handoff: 0.25
   calendar_waits: none
 owner: Thao            # suggested owner; anyone may pick this ticket
-status: ready
+status: proposed
 ---
 
 # G07 Data intake, profiling and mapping validation
