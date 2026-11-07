@@ -25,7 +25,7 @@ estimate:
   handoff: 0.5
   calendar_waits: none
 owner: Thao            # suggested owner; anyone may pick this ticket
-status: ready
+status: proposed
 ---
 
 # G22 Presentation to organisers: technical
@@ -36,7 +36,7 @@ The organisers can judge the econometric soundness: identification rules, compil
 
 ## Scope
 
-- In: 
+- In: the technical deck outline for the organisers: identification rules, compiler mapping, benchmark design and the answer-key outcome as counts and allowed numbers.
 - Route: see design
 - Depth: MVP depth per design §3; floor kept (no secrets, spend stop, pinned models).
 

@@ -6,7 +6,7 @@ plan: docs/plans/truelift.md
 primary_skill: adk-agent-instructions
 supporting_skills: [adk-agent-evaluation (personas)]
 docs: [adk-agent-instructions/references/exemplars.md, adk-agent-instructions/references/instruction-vs-code.md]
-blocked_by: [G05]
+blocked_by: [G04, G05]
 touches: [templates/slots.yaml, data/sample/persona_cmo.yaml, data/sample/personas/]
 parallel_safe: no
 contracts: [C3, C11, C14, C13]
@@ -23,9 +23,9 @@ estimate:
   review_and_verify: 1-2
   total: 5-8
   handoff: none
-  calendar_waits: none
+  calendar_waits: Ruslan reads the question phrasing (manual check)
 owner: Thao            # suggested owner; anyone may pick this ticket
-status: ready
+status: proposed
 ---
 
 # G12 Question bank, slot catalogue and personas

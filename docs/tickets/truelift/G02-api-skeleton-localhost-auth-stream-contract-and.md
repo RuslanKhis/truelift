@@ -56,7 +56,7 @@ none
 - [ ] A4 `/run`, `/run_sse`, `/apps/...` and `/list-apps` return the SPA shell or 404 and cause no model call (SB05).
 - [ ] A5 `nosniff`, a CSP with `default-src 'self'` and `frame-ancestors 'none'` are present. `/docs` and `/openapi.json` are served only with `TRUELIFT_DEV=1` (SB07).
 - [ ] A6 Oversize or malformed bodies return 413 or 422. A forced exception or a database error returns a generic 500 with a request ID and no stack trace (SB09, SB13).
-- [ ] A7 A second concurrent agent message on the same project returns 409 (C15).
+- [ ] A7 A second concurrent agent message on the same project returns 409, so a double send cannot double model spend (C15).
 - [ ] A8 `make check` regenerates the client from the offline OpenAPI dump and fails on drift. The fake stream replays a recorded event file (floor)
 
 Verification, automated: `uv run pytest tests/api` exits 0; `make check` exits 0 with no client drift (offline).

@@ -52,9 +52,9 @@ none
 
 ## Acceptance
 
-- [ ] A1 The note lists the installed versions, the exact constructor and `run_full_pipeline` parameters used, the output files the digest will read, and confirms that `doubleml_pipeline.agent` is absent (C2).
+- [ ] A1 The public note lists the installed versions, the constructor and `run_full_pipeline` parameters as used on the stand-in synthetic panel (the private-CSV config stays in `private/`), the output files the digest will read, and confirms that `doubleml_pipeline.agent` is absent (C2).
 - [ ] A2 Wall-clock time and peak RAM for Quick and Standard on the reference Mac, with CPU count. These set D9 and the caps in G09 (C9).
-- [ ] A3 Three repeated Standard runs: the spread of total ROI and of the CI bounds. The note proposes the tolerance δ for C9 and says whether saved hyperparameters can be reused (C9).
+- [ ] A3 Three repeated Standard runs on the stand-in panel: the spread of total ROI and of the CI bounds (private-CSV results stay in `private/`). The note proposes the tolerance δ for C9 and says whether saved hyperparameters can be reused (C9).
 - [ ] A4 Claude via ADK `LiteLlm` works with the key passed per call and no environment variable; Gemini works with the key passed per call (C7).
 - [ ] A5 macOS `libomp` requirement for lightgbm and xgboost: needed or not, and the fix (feeds G23) (floor)
 

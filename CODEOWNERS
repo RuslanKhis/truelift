@@ -15,6 +15,7 @@
 # Econometrics (design D18): Thao owns rules/ and templates/ and is a required
 # reviewer for the causal core. GitHub ignores owners without write access, so
 # these lines take effect once Thao accepts the collaborator invitation.
-/rules/                             @thithachthaotran
-/templates/                         @thithachthaotran
+# Ruslan is second owner so that Thao's own PRs can get a code-owner review.
+/rules/                             @thithachthaotran @RuslanKhis
+/templates/                         @thithachthaotran @RuslanKhis
 /src/truelift/causal/               @thithachthaotran @RuslanKhis

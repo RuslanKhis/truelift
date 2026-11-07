@@ -25,7 +25,7 @@ estimate:
   handoff: 0.5
   calendar_waits: none
 owner: Ruslan            # suggested owner; anyone may pick this ticket
-status: ready
+status: proposed
 ---
 
 # G18 Agent-driven benchmark and CI smoke

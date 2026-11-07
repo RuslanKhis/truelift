@@ -19,13 +19,13 @@ phase: 1
 type: implementation
 profile: MVP or pilot
 estimate:
-  hands_on: 5-7
+  hands_on: 6-8.5
   review_and_verify: 1-2
-  total: 6-9
+  total: 7-10.5
   handoff: 0.5
   calendar_waits: none
 owner: Chloe            # suggested owner; anyone may pick this ticket
-status: ready
+status: proposed
 ---
 
 # G17 UI: run progress and results
@@ -36,7 +36,7 @@ The user sees honest progress and a results page where the numbers come from cod
 
 ## Scope
 
-- In: 
+- In: the run page (phase bar, polling, cancel), the results page (digest tiles, breakdowns, labelled narrative from a fixture), the egress-ledger page (D17) and the budget view with its change control (C15).
 - Out: the live Explainer; the narrative renders from a `Narrative` fixture, and G20 connects the live agent.
 - Route: see design
 - Depth: MVP depth per design §3; floor kept (no secrets, spend stop, pinned models).
@@ -56,6 +56,7 @@ none
 - [ ] A3 Tiles come from the digest: ROI, CI, verdict against the threshold, break-even margin, and warnings beside the number (C6).
 - [ ] A4 A scripted narrative containing an image tag with an `onerror` handler, a `javascript:` link and an image from an unlisted host renders inert and loads nothing (SB10).
 - [ ] A5 Each statement shows its label and a citation that links to the finding (C5).
+- [ ] A6 The ledger page lists each model call's categories, bytes and tokens with no content, and the budget view shows use against the limit and lets the user change it (C8, C15).
 
 Verification, automated: `npm --prefix frontend run test` exits 0 with digest and Narrative fixtures (local).
 Verification, manual: none.

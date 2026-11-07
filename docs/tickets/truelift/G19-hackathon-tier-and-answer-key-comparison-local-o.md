@@ -25,7 +25,7 @@ estimate:
   handoff: 0.5
   calendar_waits: none
 owner: Thao            # suggested owner; anyone may pick this ticket
-status: ready
+status: proposed
 ---
 
 # G19 Hackathon tier and answer-key comparison (local only)
@@ -51,7 +51,7 @@ none
 ## Acceptance
 
 - [ ] A1 Five repetitions on a core developer's machine: the CI covers 2.50 in 5/5 and the median point estimate is within ±25%, or a shortfall is recorded with a diagnosis comparing it with the expert's 1.64 (C14).
-- [ ] A2 `private/answer-key-comparison.md` explains every difference between the agent and the expert in `x_cols`, CATE covariates and normalisation. This plan's evidence records only the number of differences and the outcome numbers (C13).
+- [ ] A2 `private/answer-key-comparison.md` explains every difference between the agent and the expert in `x_cols`, CATE covariates and normalisation. This plan's evidence records only the number of differences and whether C14 passed; the numbers stay in `private/` (C13).
 - [ ] A3 The guard and gitleaks are clean on the branch, and `git status` shows nothing under `private/` tracked (C13).
 
 Verification, automated: `uv run pytest -m private` exits 0 on a core developer's machine with `private/benchmark.yaml` present (local only); `make check` exits 0.

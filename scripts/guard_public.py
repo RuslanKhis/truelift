@@ -8,6 +8,9 @@ packages must contain:
 * no ``*.ipynb`` or ``*.pdf`` file;
 * no ``*.csv`` file outside ``data/sample/``;
 * no hackathon truth-column prefix outside the allowlisted files;
+* no dataset-identifying term (the hackathon's event and file names and the
+  earlier example market) in the tree, staged files or packages. History
+  before 2026-11-07 is an accepted exception, so ``--history`` skips this rule;
 * no API key matching the Google (``AIza…``, ``AQ.…``), Anthropic
   (``sk-ant-…``) or OpenAI (``sk-…``) patterns. gitleaks enforces the same
   key patterns through ``.gitleaks.toml``.
@@ -43,6 +46,21 @@ from typing import Iterable, Iterator, List, NamedTuple, Optional, Tuple
 # even in this file. Matching ignores case, so variants are caught too.
 TRUTH_PREFIX = base64.b64decode("VHJ1ZUNvbnRyaWI=").decode("ascii")
 TRUTH_PREFIX_RE = re.compile(re.escape(TRUTH_PREFIX), re.IGNORECASE)
+
+# Terms that would tie the public repository to the source dataset (D13,
+# revised 2026-11-07). Base64-encoded for the same reason as the prefix;
+# matched case-insensitively.
+_IDENTIFYING_TERMS_B64 = (
+    "SGFja3Rob24=",
+    "TWVyaWRpYW4gSGFja2F0aG9u",
+    "TWVyaWRpYW5fRE1M",
+    "TWVyaWRpYW4gKyBETUw=",
+    "QVUgTWVyaWRpYW4=",
+    "U3lkbmV5IENoYXB0ZXI=",
+    "c2tpbmNhcmU=",
+)
+IDENTIFYING_TERMS = tuple(base64.b64decode(t).decode("ascii") for t in _IDENTIFYING_TERMS_B64)
+IDENTIFYING_RE = re.compile("|".join(re.escape(t) for t in IDENTIFYING_TERMS), re.IGNORECASE)
 
 # Files allowed to name the truth prefix (D13). CODEOWNERS covers both.
 TRUTH_PREFIX_ALLOWLIST = frozenset(
@@ -99,9 +117,10 @@ def path_violations(path: str, *, sample_anywhere: bool = False) -> List[Violati
     return found
 
 
-def content_violations(path: str, data: bytes) -> List[Violation]:
-    """Content rules: the truth prefix and the key patterns. Binary blobs are
-    skipped; the path rules still apply to them."""
+def content_violations(path: str, data: bytes, *, check_terms: bool = True) -> List[Violation]:
+    """Content rules: the truth prefix, the key patterns and (unless
+    ``check_terms`` is false) the identifying terms. Binary blobs are skipped;
+    the path rules still apply to them."""
     if b"\x00" in data[:BINARY_SNIFF_BYTES]:
         return []
     text = data.decode("utf-8", errors="replace")
@@ -110,6 +129,8 @@ def content_violations(path: str, data: bytes) -> List[Violation]:
     for number, line in enumerate(text.splitlines(), start=1):
         if check_prefix and TRUTH_PREFIX_RE.search(line):
             found.append(Violation(path, number, "truth-prefix"))
+        if check_terms and IDENTIFYING_RE.search(line):
+            found.append(Violation(path, number, "identifying-term"))
         for rule, pattern in KEY_PATTERNS:
             if pattern.search(line):
                 found.append(Violation(path, number, rule))
@@ -218,7 +239,7 @@ def scan_history() -> Tuple[int, List[Violation]]:
         if data is None:  # tree or commit object
             continue
         for path in sorted(blobs[sha]):
-            for violation in content_violations(path, data):
+            for violation in content_violations(path, data, check_terms=False):
                 found.append(violation._replace(path=f"{path} @ {sha[:12]}"))
     return len(blobs), found
 

@@ -69,22 +69,32 @@ def _stage(repo: Path, rel: str, content: str | bytes) -> None:
 
 # --- A2: each forbidden kind fails when staged ------------------------------
 
-STAGED_CASES = [
-    pytest.param("private/benchmark.yaml", "paths: []\n", "private-path", id="private-dir"),
-    pytest.param("analysis/model.ipynb", '{"cells": []}\n', "notebook", id="ipynb"),
-    pytest.param("docs/deck.pdf", b"%PDF-1.7\n\x00\x01", "pdf", id="pdf"),
-    pytest.param("data/raw/panel.csv", "week,revenue\n1,10\n", "csv-outside-data-sample", id="csv"),
-    pytest.param("notes/NOTEBOOK.IPYNB", "{}\n", "notebook", id="ipynb-upper-case"),
-    pytest.param(
-        "src/truelift/features.py", f"DROP = '{PREFIX}_Discount_Total'\n", "truth-prefix", id="truth-prefix"
-    ),
-    pytest.param(
-        "docs/notes.md", f"column {PREFIX.lower()}_tv\n", "truth-prefix", id="truth-prefix-lower-case"
-    ),
-] + [
-    pytest.param("config/settings.py", f"API_KEY = '{value}'\n", rule, id=rule)
-    for rule, value in FAKE_KEYS.items()
-]
+STAGED_CASES = (
+    [
+        pytest.param("private/benchmark.yaml", "paths: []\n", "private-path", id="private-dir"),
+        pytest.param("analysis/model.ipynb", '{"cells": []}\n', "notebook", id="ipynb"),
+        pytest.param("docs/deck.pdf", b"%PDF-1.7\n\x00\x01", "pdf", id="pdf"),
+        pytest.param("data/raw/panel.csv", "week,revenue\n1,10\n", "csv-outside-data-sample", id="csv"),
+        pytest.param("notes/NOTEBOOK.IPYNB", "{}\n", "notebook", id="ipynb-upper-case"),
+        pytest.param(
+            "src/truelift/features.py",
+            f"DROP = '{PREFIX}_Discount_Total'\n",
+            "truth-prefix",
+            id="truth-prefix",
+        ),
+        pytest.param(
+            "docs/notes.md", f"column {PREFIX.lower()}_tv\n", "truth-prefix", id="truth-prefix-lower-case"
+        ),
+    ]
+    + [
+        pytest.param("docs/story.md", f"Example: {term.upper()} brand\n", "identifying-term", id=f"term-{i}")
+        for i, term in enumerate(guard.IDENTIFYING_TERMS)
+    ]
+    + [
+        pytest.param("config/settings.py", f"API_KEY = '{value}'\n", rule, id=rule)
+        for rule, value in FAKE_KEYS.items()
+    ]
+)
 
 
 @pytest.mark.parametrize(("rel", "content", "rule"), STAGED_CASES)
@@ -168,6 +178,22 @@ def test_history_finds_deleted_files(repo: Path) -> None:
     assert result.returncode == 1
     assert "key:anthropic-api-key" in result.stderr
     assert "private/notes.md: private-path" in result.stderr
+
+
+def test_history_skips_identifying_terms(repo: Path) -> None:
+    """Old commits may hold identifying terms (accepted exception, D13)."""
+    _stage(repo, "docs/old.md", f"{guard.IDENTIFYING_TERMS[-1]} example\n")
+    _git(repo, "commit", "-q", "-m", "old wording")
+    _git(repo, "rm", "-q", "docs/old.md")
+    _git(repo, "commit", "-q", "-m", "reword")
+    assert _run(repo, "--history").returncode == 0
+
+
+def test_identifying_terms_are_never_printed(repo: Path) -> None:
+    _stage(repo, "note.md", f"{guard.IDENTIFYING_TERMS[0]}\n")
+    result = _run(repo, "--staged")
+    assert result.returncode == 1
+    assert guard.IDENTIFYING_TERMS[0].lower() not in (result.stdout + result.stderr).lower()
 
 
 def test_history_of_clean_repo_passes(repo: Path) -> None:

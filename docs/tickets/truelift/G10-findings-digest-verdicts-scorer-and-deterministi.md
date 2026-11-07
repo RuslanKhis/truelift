@@ -25,7 +25,7 @@ estimate:
   handoff: 0.5
   calendar_waits: none
 owner: Thao            # suggested owner; anyone may pick this ticket
-status: ready
+status: proposed
 ---
 
 # G10 Findings digest, verdicts, scorer and deterministic synthetic tier

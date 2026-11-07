@@ -36,7 +36,7 @@ Econometric knowledge is written as data that code enforces and Thao verifies (C
 
 ## Scope
 
-- In: - `rules/identification.yaml`: minimum weeks, regions and rows; treatment-variation thresholds. - `rules/proxies.yaml`. - `rules/normalisation.yaml`: semantic type → scaler list. - `rules/cate.yaml`: maximum covariates and degree rule. - `templates/*.yaml`: one per business type, in Thao's own words, with nodes, roles, default edges and the slots that confirm each edge. - `tests/golden/*.yaml`: at least 15 cases, each giving a DAG plus mapping and the expected decision, adjustment set and `x_cols`/CATE.
+- In: - `rules/identification.yaml`: minimum weeks, regions and rows; treatment-variation thresholds. - `rules/proxies.yaml`. - `rules/normalisation.yaml`: semantic type → scaler list. - `rules/cate.yaml`: maximum covariates and degree rule. - `rules/truth_sidecar.yaml`: the schema of a benchmark's `truth.yaml` (truth columns, hidden confounders, true ROI), which G04 writes and G06 reads (C4). - `templates/*.yaml`: one per business type, in Thao's own words, with nodes, roles, default edges and the slots that confirm each edge. - `tests/golden/*.yaml`: at least 15 cases, each giving a DAG plus mapping and the expected decision, adjustment set and `x_cols`/CATE.
 - Route: YAML schemas as in design §5. A small loader with pydantic validation.
 - Depth: MVP depth per design §3; floor kept (no secrets, spend stop, pinned models).
 
@@ -54,7 +54,8 @@ none
 - [ ] A2 The templates cover the five business types and validate against the schema (C3).
 - [ ] A3 Each proxy rule has a caveat text the UI can show (C3).
 - [ ] A4 At least 15 golden cases, including a mediator trap, an unobserved confounder with no proxy, a proxy accepted, a descendant of the treatment, a collider, low variation and a percentage treatment with spend. Each states its expected outcome (C3, C2).
-- [ ] A5 CODEOWNERS makes Thao a required reviewer for `rules/`, `templates/` and `src/truelift/causal/` (C3).
+- [ ] A5 CODEOWNERS names Thao, with Ruslan as second owner, for `rules/`, `templates/` and `src/truelift/causal/`, and `main` requires a code-owner review (C3).
+- [ ] A6 `rules/truth_sidecar.yaml` validates G04's seed-1 `truth.yaml` shape in a schema test (C4).
 
 Verification, automated: `uv run pytest tests/golden -k schema` exits 0 (offline).
 Verification, manual: none.

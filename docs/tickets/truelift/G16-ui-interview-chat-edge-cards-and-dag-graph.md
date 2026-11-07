@@ -6,7 +6,7 @@ plan: docs/plans/truelift.md
 primary_skill: adk-frontend-integration
 supporting_skills: []
 docs: [adk-frontend-integration/references/agent-ui-states.md]
-blocked_by: [G15, G06, G08]
+blocked_by: [G15, G06, G08, G31]
 touches: [frontend/src/routes/interview/, frontend/src/components/dag/]
 parallel_safe: no
 contracts: [C1, C3, C11]
@@ -25,7 +25,7 @@ estimate:
   handoff: 0.5
   calendar_waits: none
 owner: Chloe            # suggested owner; anyone may pick this ticket
-status: ready
+status: proposed
 ---
 
 # G16 UI: interview chat, edge cards and DAG graph
