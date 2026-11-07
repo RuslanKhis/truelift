@@ -20,15 +20,15 @@ The core principle is that **the model talks and code decides**. The LLM phrases
 
 ## 2. Purpose and constraints
 
-**User and journey.** A CMO at a mid-size skincare brand in India runs weekly discounts across six regions. They suspect that some discounts lose money, but nobody on staff can do causal inference. The journey goes like this:
+**User and journey.** A CMO at a mid-size pet-food brand in Germany runs weekly discounts across eight regions. They suspect that some discounts lose money, but nobody on staff can do causal inference. The journey goes like this:
 
 1. With help from an LLM assistant, they install truelift and run `truelift`. The browser opens on `localhost`.
 2. They paste a Gemini key. They read the screen that lists exactly what will leave the machine, and they consent.
 3. They upload `sales_panel.csv`. truelift detects a weekly × region panel and proposes roles: outcome, discount rate, discount spend and the others. The user confirms the roles.
 4. The interview runs for about 20–30 minutes. Typical questions: "What makes you decide to run a discount in a given week or region?" and "What else changes when you discount: store traffic, search, shelf space?" Each answer becomes a fact in `business.md` or `market.md`, after the user accepts it.
-5. The user reviews the DAG as edge cards, for example: *"Festival weeks make you discount more **and** lift sales on their own."* Each card offers Agree, Disagree or Not sure. The identification check passes or says exactly what is missing.
+5. The user reviews the DAG as edge cards, for example: *"Holiday weeks make you discount more **and** lift sales on their own."* Each card offers Agree, Disagree or Not sure. The identification check passes or says exactly what is missing.
 6. They choose **Run**. A Standard run takes minutes; the duration is measured in plan goal G03. The tab can be closed and reopened.
-7. Results appear. The page leads with a headline tile, for example "₹2.1 back per ₹1 of discount, 95% range ₹−0.4 to ₹4.6; break-even at your 40% margin is ₹2.5: **undetermined**". It then breaks the result down by region and season and ends with labelled statements, such as *"Hypothesis: January discounts pull sales forward; test by pausing them in two regions."*
+7. Results appear. The page leads with a headline tile, for example "€2.1 back per €1 of discount, 95% range €−0.4 to €4.6; break-even at your 40% margin is €2.5: **undetermined**". It then breaks the result down by region and season and ends with labelled statements, such as *"Hypothesis: January discounts pull sales forward; test by pausing them in two regions."*
 
 **Current friction.** Building a defensible DAG takes a person who knows the business and an econometrician. Most companies have only the first. Running the pipeline by hand also means filling `x_cols`, CATE covariates and normalisation in Python.
 
@@ -55,8 +55,8 @@ Section 11 lists the seams that keep these open.
 - A `percentage` treatment forces `simple_optimization=True`.
 - The pipeline warns when a cluster key has fewer than 30 clusters. It also warns when there are fewer than 1,000 rows and CATE covariates are set.
 - The pipeline has **no `margin` parameter**. The ROI threshold is `opt_threshold_roi`, default 1.0.
-- The hackathon panel has 804 rows: 6 geos × 134 weeks.
-- In the private reference run, the expert linear configuration estimated ROI 1.64 [−1.64, 4.92] against a true 2.50. Saturation fell back to linear, and the run warned about the 6 geo clusters.
+- The reference panel is small: fewer than 30 regions and fewer than 1,000 rows, so both warnings above apply to it.
+- In the private reference run, the expert linear configuration estimated ROI 1.64 [−1.64, 4.92] against a true 2.50. Saturation fell back to linear, and the run warned about too few region clusters.
 
 ## 3. Delivery constraints, depth and deferred controls
 
@@ -65,7 +65,7 @@ Section 11 lists the seams that keep these open.
 | First useful version due, and what happens after it | No deadline. The project continues as open source. Milestone 1 (M1) is a convincing end-to-end demo that passes the ground-truth benchmark on the public synthetic data and, locally, on the private hackathon CSV. |
 | People and hours | Ruslan (lead, agent and backend, knows ADK), Chloe (React), Thao (econometrics). Each has about 2–3 h/week, so 6–9 h/week in total. Estimates use ×1.5 only for Chloe's and Thao's goals that touch the agent. |
 | Money | Each end user brings their own LLM key and pays for their own usage. The team's development LLM budget is about **$20/month**. CI uses recorded model replies, and live evaluation runs on demand with a call cap. No cloud spend. |
-| Users or judge, and what they read | End users are CMOs and marketing leaders. **The M1 judges are the Google AU Meridian + DML hackathon organisers**, who see a demo plus business and technical presentations. Their feedback gates phase 2. |
+| Users or judge, and what they read | End users are CMOs and marketing leaders. **The M1 judges are the hackathon organisers**, who see a demo plus business and technical presentations. Their feedback gates phase 2. |
 | Data touched and effects allowed | The user's aggregated sales panel, which normally holds no personal data. A bounded summary of it goes to the user's chosen LLM provider with their consent (C8). All writes are local, to the user's own project folder. There are no external effects. |
 | Portability or lock-in concern | No cloud is involved. Model portability is already a requirement (R6). No portability goal. |
 | Delivery profile | **MVP or pilot, self-hosted open source.** Real outside users will run it on real data. Phase 1 is built to demo depth for the organisers. Phase 2 graduates it for the first outside CMOs. |
@@ -238,7 +238,7 @@ sequenceDiagram
 | D11 | R2 | **Packaging.** A wheel on PyPI ships the prebuilt SPA. Users install with `uv tool install truelift`; uv also provisions Python 3.12. `truelift` opens the browser. Users need no Node; only developers do. A dedicated install page is written for users to paste into their LLM assistant. | Smallest install that brings its own Python and needs no admin rights on Mac or Windows | Heavy wheels (lightgbm, xgboost). macOS may need `libomp`; G03 verifies and G23 handles it. Alternatives: Docker (too heavy for CMOs) and a desktop bundle (Later). | G23 (phase 2) |
 | D12 | C16 | **Localhost security.** Bind to 127.0.0.1 on a free port. The CLI opens `http://127.0.0.1:<port>/#token=<random>`; the SPA moves the token to `sessionStorage` and sends it as `Authorization: Bearer`. Host allowlist, Origin check, no CORS, ADK's own server never started. | Stops other local processes and malicious web pages (CSRF, DNS rebinding) from driving the agent or reading data | Opening a new browser needs the launch URL again; the CLI prints it. | G02/A1–A3 |
 | D13 | C13 | **Confidentiality guard.** `scripts/guard_public.py` runs from pre-commit and as a required CI job. It denies any path under `private/`; any `*.ipynb` or `*.pdf`; any `*.csv` outside `data/sample/`; the hackathon truth-column prefix (named in the brief) outside `src/truelift/causal/forbidden.py` and the guard itself; and the key patterns `AIza…`, `AQ.…`, `sk-ant-…` and `sk-…`, also enforced by gitleaks custom rules. The private benchmark reads `private/benchmark.yaml`, which lists local paths, and skips when it is absent. Public code never names hackathon files. *(Revised G01, 2026-11-07.)* The prefix is stored base64-encoded in both allowlisted files, so the literal is nowhere in the repository, its history or its packages; a test keeps the two encoded constants equal. The match is case-insensitive on the stem. Only the top-level `private/` is denied (`tests/private/` holds the skip-guarded tests). The modes are `--staged` (pre-commit), `--tree` (tracked plus untracked files that are not ignored; `make check` and CI), `--history` (every blob in every ref; CI) and `--dist` (sdist and wheel). | The brief's guard list, minus one conflict: the code must name the prefix in order to deny it, so two files are allowlisted, and both hold it only encoded | The allowlist is a small hole; CODEOWNERS on both files covers it. Encoding makes the code a little harder to read. | G01/A2–A6 |
-| D14 | C14, C4 | **Our own synthetic market** (`truelift.sample`, owned by Thao): a fictional consumer brand in a market other than India, 8 regions × 156 weeks, weekly discount rate plus discount spend. It has confounders (a retail festival that drives both discounting and sales, distribution, media flighting correlated with promos), an optional unobserved confounder switch, a **mediator trap** (store traffic or branded search caused by the discount), heterogeneity (ROI higher in festival weeks, negative in the low season), and `truth_*` columns with `truth.yaml`. Deterministic by seed; 20 seeds for coverage. | Public, so it can power the quickstart and CI. Multiple seeds measure real CI coverage, which one dataset cannot. | The generator must be built and validated (Thao's hours). The panel differs from the hackathon on purpose: same format, different market. | G04/A1–A6 |
+| D14 | C14, C4 | **Our own synthetic market** (`truelift.sample`, owned by Thao): a fictional consumer brand in a fictional market that resembles no real brand or dataset, 8 regions × 156 weeks, weekly discount rate plus discount spend. It has confounders (a holiday season that drives both discounting and sales, distribution, media flighting correlated with promos), an optional unobserved confounder switch, a **mediator trap** (store traffic or branded search caused by the discount), heterogeneity (ROI higher in holiday weeks, negative in the low season), and `truth_*` columns with `truth.yaml`. Deterministic by seed; 20 seeds for coverage. | Public, so it can power the quickstart and CI. Multiple seeds measure real CI coverage, which one dataset cannot. | The generator must be built and validated (Thao's hours). The panel differs from the hackathon on purpose: same format, different market. | G04/A1–A6 |
 | D15 | C14, C2 | **Benchmark harness** `truelift bench`. A scripted persona (YAML answers per slot) drives the *real* Interviewer, with recorded replies in CI and live on demand under a call cap. It produces the DAG, identification and compiled config, runs the pipeline, builds the digest and scores against the truth. CI runs one dataset in Quick mode on every PR; the full tiers run at milestones on a developer machine. | Tests the whole agent-built path, not only the deterministic half | Recorded replies can go stale when prompts change. Live re-recording is part of any prompt change (D16). | G18/A1–A4 |
 | D16 | C14 | **Model-agnostic evaluation within $20/month.** Replay fixtures per provider. One live Gemini persona run and one live Claude persona run per prompt change, under a call cap. | Proves the LiteLLM path without a standing spend | Drift between releases is caught only at prompt changes and milestones. | G18/A4 |
 | D17 | C8 | **Disclosure screen and egress ledger.** Before the first call, a versioned disclosure lists the provider, the categories (C8) and an example payload built from the user's own file. The ledger page shows every call: time, provider, model, categories, bytes and tokens. | Users see exactly what leaves the machine before it does | One more screen in setup | G15/A2, G11/A3 |
@@ -257,7 +257,7 @@ The interview runs as **modules**. Each module owns slots, and each slot has a D
 | Module | Example opening question (open, not leading) | Slot → DAG meaning |
 | --- | --- | --- |
 | 1. Business and channel | "Walk me through how a customer ends up buying your product." | Business type → template choice; sales channel; units (regions, categories) |
-| 2. Market and calendar | "Which times of year are busiest or quietest for you, and why?" | Seasons, festivals and holidays, weather, macro shocks → common causes of discounting and sales |
+| 2. Market and calendar | "Which times of year are busiest or quietest for you, and why?" | Seasons, holidays and events, weather, macro shocks → common causes of discounting and sales |
 | 3. How discounts are decided | "Think of the last few discounts you ran. What made you decide on those weeks, and on how deep?" | **Treatment-assignment drivers → confounders** (the most important module) |
 | 4. Other sales drivers | "Apart from discounts, what moves your weekly sales?" | Predictors of the outcome |
 | 5. What a discount changes | "When a discount runs, what else changes on the way to the sale: footfall, search, shelf space?" | **Mediators**, excluded from the controls (C3a) |
@@ -268,7 +268,7 @@ The interview runs as **modules**. Each module owns slots, and each slot has a D
 Rules the Interviewer follows (owned by `adk-agent-instructions`, measured in G26):
 
 - One question per turn. Open question first. If options are given, they are balanced and include "not sure" and "something else". The agent never hints which answer lets the analysis pass.
-- It asks for concrete examples ("last Diwali, what did you do?") and reflects the answer back in the user's words before proposing a fact.
+- It asks for concrete examples ("last Black Friday, what did you do?") and reflects the answer back in the user's words before proposing a fact.
 - **"I don't know"** records the slot as `unknown`. The agent tries one simpler or data-grounded question. If the slot is still unknown, the template default applies, labelled `assumed`, and shown on the edge card. It blocks only if identification needs it (C3b), and then the block offers proxy, risk acceptance or "add data".
 - **Contradictions.** If a new answer conflicts with a confirmed fact, the proposal is marked `contradiction`. The UI shows both answers with their turn references, and the user chooses (C11). The DAG derived from the old fact turns stale (C1).
 - Data-grounded probes use only the profile facts from `data.md`, not raw rows.
@@ -299,13 +299,13 @@ The few-cluster warning appears whenever the panel has fewer than 30 regions. Th
 
 ```markdown
 ---
-project: skincare-in
+project: petfood-de
 schema: truelift.knowledge/1
 ---
 # How discounts are decided
-- [F012] We discount mostly in festival weeks (Diwali, Holi) and when stock is ageing.
-  status: confirmed · source: interview t14 "mostly around Diwali and when stock gets old" · 2026-11-05
-  supports: edge(festival_weeks -> discount), edge(inventory_age -> discount)
+- [F012] We discount mostly in holiday weeks (Black Friday, Christmas) and when stock is ageing.
+  status: confirmed · source: interview t14 "mostly around Black Friday and when stock gets old" · 2026-11-05
+  supports: edge(holiday_weeks -> discount), edge(inventory_age -> discount)
 - [F013] Competitor promotions do not influence our discount calendar.
   status: assumed · source: template default · supports: no-edge(competitor_promo -> discount)
 ```
