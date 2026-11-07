@@ -8,13 +8,21 @@ license-files = ["LICENSE", "NOTICE"]
 authors = [{ name = "RuslanKhis" }]
 # Python 3.12 is pinned for the release unit (plan: "Pinned artefacts").
 requires-python = ">=3.12,<3.13"
-# G02 adds the web stack and ADK; G03 adds doubleml-pipeline.
+# G02 adds the web stack and ADK; G03 adds doubleml-pipeline, its learners and LiteLLM.
+# doubleml-pipeline does not depend on lightgbm or xgboost; the D9 profiles need both.
+# On macOS both need libomp (G03 note, A5; G23 decides the user-facing fix).
+# LiteLLM is capped below 1.106.3, as ADK 2.13 does ("1.107.0 was a compromised release");
+# raise the cap only after checking the new release.
 # FastAPI resolves to 0.141.x because google-adk 2.12 caps opentelemetry-api (see uv.lock).
 dependencies = [
+    "doubleml-pipeline==0.2.3",
     "fastapi>=0.138",
     "google-adk>=2.12,<2.13",
+    "lightgbm>=4.7.0",
+    "litellm>=1.84,<1.106.3",
     "python-multipart>=0.0.20",
     "uvicorn>=0.30",
+    "xgboost>=3.4.1",
 ]
 
 [project.scripts]
@@ -25,6 +33,7 @@ dev = [
     "httpx>=0.28.1",
     "pip-audit>=2.10.1",
     "pre-commit>=4.7.0",
+    "psutil>=7.2.2",
     "pytest>=9.2.0",
     "ruff>=0.17.4",
 ]
@@ -42,6 +51,10 @@ only-include = ["src/truelift", "tests", "scripts/guard_public.py"]
 
 [tool.uv]
 required-version = ">=0.13"
+# litellm 1.106.2 caps filelock below 4.0, and every 3.x release has open advisories
+# (fixed in 4.0.9 and 4.2.1). litellm imports filelock only in its proxy CLI commands,
+# which truelift does not use. Drop this once litellm lifts the cap (G03).
+override-dependencies = ["filelock>=4.2.1"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

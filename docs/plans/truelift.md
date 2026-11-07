@@ -221,7 +221,7 @@ No dependency, wait or review was removed.
   security: []
   mentions_only: []
   type: discovery
-  status: planned
+  status: done
 - goal: G04
   phase: 1
   hands_on: 5-8
@@ -632,7 +632,7 @@ G02 wrote the companion table into [`AGENTS.md`](../../AGENTS.md#companion-skill
 | --- | --- | --- | --- | --- | --- | --- |
 | [G01](../tickets/truelift/G01-repo-foundation-and-confidentiality-guard.md) Repo foundation and confidentiality guard | 1 | implementation | 1 (actual; est. 2–4) | — | `adk-release-engineering` | done |
 | [G02](../tickets/truelift/G02-api-skeleton-localhost-auth-stream-contract-and.md) API skeleton, localhost auth, stream contract, generated client | 1 | implementation | 3–5 (actual 0.5) | G01 | `adk-fastapi-backend` | done |
-| [G03](../tickets/truelift/G03-pipeline-feasibility-spike.md) Pipeline feasibility spike | 1 | discovery | 2.5–5 | G01 | `adk-engineer` | ready |
+| [G03](../tickets/truelift/G03-pipeline-feasibility-spike.md) Pipeline feasibility spike | 1 | discovery | 2.5–5 | G01 | `adk-engineer` | done |
 | [G04](../tickets/truelift/G04-synthetic-market-generator-and-truth.md) Synthetic market generator and truth | 1 | implementation | 6–10 | G01 | `adk-agent-evaluation` | ready |
 | [G05](../tickets/truelift/G05-rules-dag-templates-and-golden-cases.md) Rules, DAG templates and golden cases | 1 | implementation | 5–8 | G01 | `adk-agent-evaluation` | ready |
 | [G06](../tickets/truelift/G06-causal-core-dag-identification-and-config-compil.md) Causal core: DAG, identification, compiler | 1 | implementation | 5–8 | G03, G05 | `adk-workflow-design` | proposed |
