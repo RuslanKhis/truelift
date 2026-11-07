@@ -1,0 +1,12 @@
+{"seq": 1, "turn_id": "t-recorded", "type": "turn_started"}
+{"seq": 2, "turn_id": "t-recorded", "type": "tool_started", "call_id": "c-1", "tool": "get_knowledge", "title": "Reading what you told me so far"}
+{"seq": 3, "turn_id": "t-recorded", "type": "tool_finished", "call_id": "c-1", "tool": "get_knowledge", "ok": true, "summary": "12 facts in business.md"}
+{"seq": 4, "turn_id": "t-recorded", "type": "text_delta", "message_id": "m-1", "delta": "Thanks. So holiday weeks and ageing stock drive most discounts. "}
+{"seq": 5, "turn_id": "t-recorded", "type": "text_delta", "message_id": "m-1", "delta": "Earlier you said competitor promotions don't affect your calendar, "}
+{"seq": 6, "turn_id": "t-recorded", "type": "text_delta", "message_id": "m-1", "delta": "but now you mention answering them the same week. Which is closer to how it works?"}
+{"seq": 7, "turn_id": "t-recorded", "type": "text_done", "message_id": "m-1", "text": "Thanks. So holiday weeks and ageing stock drive most discounts. Earlier you said competitor promotions don't affect your calendar, but now you mention answering them the same week. Which is closer to how it works?"}
+{"seq": 8, "turn_id": "t-recorded", "type": "tool_started", "call_id": "c-2", "tool": "propose_fact", "title": "Proposing a fact"}
+{"seq": 9, "turn_id": "t-recorded", "type": "tool_finished", "call_id": "c-2", "tool": "propose_fact", "ok": true, "summary": "2 proposals"}
+{"seq": 10, "turn_id": "t-recorded", "type": "proposal_created", "proposal": {"id": "P007", "kind": "fact", "status": "pending", "file": "business.md", "fact_id": "F014", "summary": "Discounts are planned around holiday weeks and ageing stock.", "new_text": "We discount mostly in holiday weeks and when stock is ageing.", "source": {"turn": 14, "text": "mostly around the holidays and when stock gets old"}, "contradiction": false, "contradicts": null}}
+{"seq": 11, "turn_id": "t-recorded", "type": "proposal_created", "proposal": {"id": "P008", "kind": "fact", "status": "pending", "file": "business.md", "fact_id": "F009", "summary": "Competitor promotions now said to influence the discount calendar.", "new_text": "We react to competitor promotions in the same week.", "source": {"turn": 15, "text": "if the competitor runs a promo we usually answer that week"}, "contradiction": true, "contradicts": {"turn": 6, "text": "competitors don't really affect when we discount"}}}
+{"seq": 12, "turn_id": "t-recorded", "type": "turn_finished"}

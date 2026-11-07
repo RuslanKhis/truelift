@@ -1,0 +1,3 @@
+{"seq": 1, "turn_id": "t-recorded", "type": "turn_started"}
+{"seq": 2, "turn_id": "t-recorded", "type": "ai_status", "state": "budget_paused", "message": "AI paused: budget reached. Raise it or continue without AI."}
+{"seq": 3, "turn_id": "t-recorded", "type": "turn_failed", "code": "budget_reached", "message": "This project's token budget is used up."}
