@@ -1,0 +1,5 @@
+{"seq": 1, "turn_id": "t-recorded", "type": "turn_started"}
+{"seq": 2, "turn_id": "t-recorded", "type": "text_delta", "message_id": "m-2", "delta": "Let me check the data profile for "}
+{"seq": 3, "turn_id": "t-recorded", "type": "tool_started", "call_id": "c-3", "tool": "get_data_profile", "title": "Checking the data profile"}
+{"seq": 4, "turn_id": "t-recorded", "type": "tool_finished", "call_id": "c-3", "tool": "get_data_profile", "ok": false, "summary": "The data profile is not ready yet."}
+{"seq": 5, "turn_id": "t-recorded", "type": "turn_failed", "code": "tool_failed", "message": "The assistant could not read the data profile. Try again."}

@@ -14,6 +14,7 @@ concurrency:
 
 env:
   UV_VERSION: "0.13.7"
+  NODE_VERSION: "22.23.3"
   GITLEAKS_VERSION: "8.30.1"
   # sha256 of gitleaks_8.30.1_linux_x64.tar.gz from the release's checksums.txt
   GITLEAKS_SHA256: "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
@@ -57,6 +58,10 @@ jobs:
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
           version: ${{ env.UV_VERSION }}
+      # Node builds the generated API client for the drift check (G02).
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
       - name: make check
         run: make check
       - name: make dist

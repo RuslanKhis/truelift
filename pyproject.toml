@@ -8,11 +8,21 @@ license-files = ["LICENSE", "NOTICE"]
 authors = [{ name = "RuslanKhis" }]
 # Python 3.12 is pinned for the release unit (plan: "Pinned artefacts").
 requires-python = ">=3.12,<3.13"
-# Application dependencies arrive with G02 (FastAPI, ADK) and G03 (doubleml-pipeline).
-dependencies = []
+# G02 adds the web stack and ADK; G03 adds doubleml-pipeline.
+# FastAPI resolves to 0.141.x because google-adk 2.12 caps opentelemetry-api (see uv.lock).
+dependencies = [
+    "fastapi>=0.138",
+    "google-adk>=2.12,<2.13",
+    "python-multipart>=0.0.20",
+    "uvicorn>=0.30",
+]
+
+[project.scripts]
+truelift = "truelift.cli:main"
 
 [dependency-groups]
 dev = [
+    "httpx>=0.28.1",
     "pip-audit>=2.10.1",
     "pre-commit>=4.7.0",
     "pytest>=9.2.0",

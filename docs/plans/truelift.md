@@ -624,15 +624,7 @@ This follows the designer's web defaults with three deviations:
 - Hosting is local, not Cloud Run (design §3).
 - React Flow with ELK is added for the DAG graph (D6).
 
-G02 writes this table into `AGENTS.md` with the resolved pins; after that, this section becomes a link.
-
-| Companion | Source and install | Pin | Load when | Scope notes |
-| --- | --- | --- | --- | --- |
-| `fastapi` | `uv sync && uvx library-skills --claude` | FastAPI version locked in `uv.lock` (≥ 0.138) | backend routes | Identity and ownership follow D12, not the skill's IdP examples |
-| `react-router` | `npx skills add https://github.com/remix-run/react-router --skill react-router` | `remix-run/react-router@8f364c8` (confirm on the day) | SPA routes | Data mode |
-| `vercel-react-best-practices` | `npx skills add vercel-labs/agent-skills --skill vercel-react-best-practices` | `vercel-labs/agent-skills@063bee9` | UI goals | SPA: skip the server rules; TanStack Query, not SWR |
-| `shadcn` | `npx skills add shadcn/ui` | `shadcn-ui/ui@4233ed1` | UI goals | Tokens from `docs/design/DESIGN.md` (house design system); no default theme |
-| `playwright-cli` | `npm i -g @playwright/cli@0.1.22 && playwright-cli install --skills` | 0.1.22 | G20 | Role locators; never wait for network idle on the stream |
+G02 wrote the companion table into [`AGENTS.md`](../../AGENTS.md#companion-skills) with resolved pins (2026-11-07). That table is the source; this section no longer repeats it.
 
 ## Goals and dependencies
 
