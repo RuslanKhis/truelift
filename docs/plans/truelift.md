@@ -206,7 +206,7 @@ No dependency, wait or review was removed.
   security: [SB01, SB02, SB05, SB06, SB07, SB08, SB09, SB13]
   mentions_only: [G07]
   type: implementation
-  status: planned
+  status: done
 - goal: G03
   phase: 1
   hands_on: 2-4
@@ -631,7 +631,7 @@ G02 wrote the companion table into [`AGENTS.md`](../../AGENTS.md#companion-skill
 | ID and goal | Phase | Type | Human hours | Depends on | Primary skill | State |
 | --- | --- | --- | --- | --- | --- | --- |
 | [G01](../tickets/truelift/G01-repo-foundation-and-confidentiality-guard.md) Repo foundation and confidentiality guard | 1 | implementation | 1 (actual; est. 2–4) | — | `adk-release-engineering` | done |
-| [G02](../tickets/truelift/G02-api-skeleton-localhost-auth-stream-contract-and.md) API skeleton, localhost auth, stream contract, generated client | 1 | implementation | 3–5 | G01 | `adk-fastapi-backend` | ready |
+| [G02](../tickets/truelift/G02-api-skeleton-localhost-auth-stream-contract-and.md) API skeleton, localhost auth, stream contract, generated client | 1 | implementation | 3–5 (actual 0.5) | G01 | `adk-fastapi-backend` | done |
 | [G03](../tickets/truelift/G03-pipeline-feasibility-spike.md) Pipeline feasibility spike | 1 | discovery | 2.5–5 | G01 | `adk-engineer` | ready |
 | [G04](../tickets/truelift/G04-synthetic-market-generator-and-truth.md) Synthetic market generator and truth | 1 | implementation | 6–10 | G01 | `adk-agent-evaluation` | ready |
 | [G05](../tickets/truelift/G05-rules-dag-templates-and-golden-cases.md) Rules, DAG templates and golden cases | 1 | implementation | 5–8 | G01 | `adk-agent-evaluation` | ready |

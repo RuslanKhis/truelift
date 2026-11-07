@@ -25,7 +25,7 @@ estimate:
   handoff: none
   calendar_waits: none
 owner: Ruslan            # suggested owner; anyone may pick this ticket
-status: verified_local
+status: done
 ---
 
 # G02 API skeleton, localhost auth, stream contract and generated client
@@ -72,6 +72,9 @@ Commands and results:
 - `uv run --locked pytest tests/api`: local, pass (105 tests). Full suite in `make check`: 148 passed, 1 skipped (`private materials absent`).
 - `make check`: local, pass, exit 0. Guard clean (100 files), ruff clean, `client-check: no drift`, pip-audit "No known vulnerabilities found, 1 ignored" (see Rulings), npm audit "found 0 vulnerabilities".
 - `make dist`: local, pass. Guard `--dist` clean (77 package members).
+- CI on PR #34: pass, `make check` and package content check, plus the confidentiality guard and gitleaks full-history job (run 42361333813, commit `ba0170e`). The first CI run failed on a race in `test_concurrent_second_send_is_409_over_real_socket`: the client read the last event before the server released admission. `ba0170e` makes the test wait for the release. The app did not change.
+- After merge: CI on `main` passed (merge commit `7b88b93`).
+- Accepted: Ruslan merged PR #34 on 2026-11-07 and accepted the ticket as done.
 - pass_to_pass G01/A1, G01/A2 (`tests/test_guard.py`): offline, pass before and after the change (43 passed, 1 skipped before).
 - Launcher smoke, `uv run truelift --no-browser`: local, pass. It listened on `127.0.0.1:<free port>` only (lsof). `/health` 200, `/api/projects` 401 without the token and 200 with it, `Host: evil.example` 403, `/` shell 200, SSE replay gave 12 frames. The token appeared once in the output, in the printed link.
 - `gitleaks dir`: 5 hits, all in the ignored `tests/__pycache__/test_guard…pyc` (G01's fake keys, constant-folded). None are in a tracked or new file. The CI git scan does not read ignored files.
@@ -128,10 +131,8 @@ Findings for other tickets:
 
 Estimate check: within 3–5 h. No new ticket needed.
 
-Human effort still owed (about 1–1.5 h review):
-- Read `auth.py`, `middleware.py`, `errors.py` and `stream.py`.
-- Walk Chloe through the stream contract and the fake triggers.
-- Confirm that CI passes with setup-node on the PR. `.github/` is a code-owner path.
+Human effort still owed:
+- Walk Chloe through the stream contract and the fake triggers before G15 starts (about 15 min).
 
 manual: none listed.
 actual: 0.5 h (Ruslan, reported 2026-11-07)
