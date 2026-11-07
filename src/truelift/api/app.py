@@ -17,13 +17,15 @@ from starlette.middleware import Middleware
 from truelift import __version__
 from truelift.api.auth import LocalhostGuardMiddleware, require_launch_token
 from truelift.api.errors import ERROR_RESPONSES, ApiError, RequestIdMiddleware, install_error_handlers
-from truelift.api.fakes import FakeStore
+from truelift.api.fakes import DEMO_PROJECT, FakeStore
 from truelift.api.middleware import BodyLimitMiddleware, SecurityHeadersMiddleware
 from truelift.api.routes import agent, dag, intake, projects, results, runs, setup
 from truelift.api.schemas import Health
 from truelift.api.settings import Settings
 from truelift.api.spa import router as spa_router
 from truelift.api.stream import AGENT_EVENT
+from truelift.store import ProjectStore
+from truelift.store.db import StateDb
 
 
 def _operation_id(route: APIRoute) -> str:
@@ -67,6 +69,13 @@ def create_app(settings: Settings) -> FastAPI:
     )
     app.state.settings = settings
     app.state.fakes = FakeStore()
+    # The real project store (G08). The demo project's ID stays reserved for the fakes until the
+    # routes that still serve it (G07, G09–G11, G14, G31) move to the store.
+    app.state.store = ProjectStore(
+        settings.projects_dir,
+        StateDb(settings.state_dir / "state.db", busy_timeout_s=settings.db_busy_timeout_s),
+        reserved_ids=frozenset({DEMO_PROJECT}),
+    )
     app.state.agent_busy = set()
     install_error_handlers(app)
 

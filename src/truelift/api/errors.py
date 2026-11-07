@@ -18,6 +18,8 @@ from pydantic import BaseModel, Field
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
+from truelift.store.errors import ParseFailed, StoreError
+
 log = logging.getLogger("truelift.api")
 
 REQUEST_ID_HEADER = "X-Request-ID"
@@ -183,6 +185,18 @@ async def _validation_error(request: Request, exc: Exception) -> JSONResponse:
     return error_json(422, request_id_of(request), fields=fields)
 
 
+async def _store_error(request: Request, exc: Exception) -> JSONResponse:
+    """Project-store failures (G08). A parse error names each file and line in ``fields``; a
+    failed save is a 500 with its own code and a plain message, never the OS error."""
+    assert isinstance(exc, StoreError)
+    if exc.status >= 500:
+        log.error("store error request_id=%s code=%s", request_id_of(request), exc.code, exc_info=exc)
+    fields = None
+    if isinstance(exc, ParseFailed):
+        fields = [FieldError(loc=[i.file, i.line], message=i.message) for i in exc.issues]
+    return error_json(exc.status, request_id_of(request), code=exc.code, message=exc.message, fields=fields)
+
+
 async def _unexpected_error(request: Request, exc: Exception) -> JSONResponse:
     # The full traceback stays in the local log only; the body is generic (SB13).
     log.error("unhandled error request_id=%s path=%s", request_id_of(request), request.url.path, exc_info=exc)
@@ -193,6 +207,7 @@ async def _unexpected_error(request: Request, exc: Exception) -> JSONResponse:
 
 def install_error_handlers(app: FastAPI) -> None:
     app.add_exception_handler(ApiError, _api_error)
+    app.add_exception_handler(StoreError, _store_error)
     app.add_exception_handler(StarletteHTTPException, _http_error)
     app.add_exception_handler(RequestValidationError, _validation_error)
     app.add_exception_handler(Exception, _unexpected_error)

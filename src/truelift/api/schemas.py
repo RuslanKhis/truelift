@@ -276,8 +276,26 @@ class Decision(StrEnum):
     reject = "reject"
 
 
+ProposalId = Annotated[str, StringConstraints(pattern=r"^P[0-9]{1,6}$")]
+
+
 class ProposalDecisionIn(In):
     decision: Decision
+    knowledge_version: int = Field(ge=0, description="A stale knowledge version returns 409.")
+    resolves_contradiction: bool = Field(
+        default=False,
+        description=(
+            "Accepting a proposal marked `contradiction` replaces a confirmed fact, so it needs this "
+            "set to true: the user chose the new answer for this fact. Otherwise 409 "
+            "`contradiction_choice_needed`. Rejecting keeps the confirmed fact and needs nothing."
+        ),
+    )
+
+
+class ProposalBatchIn(In):
+    """Accept several proposals at once: all are applied or none (409 on a contradiction)."""
+
+    proposal_ids: list[ProposalId] = Field(min_length=1, max_length=100)
     knowledge_version: int = Field(ge=0, description="A stale knowledge version returns 409.")
 
 
