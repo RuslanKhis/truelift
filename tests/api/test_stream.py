@@ -111,6 +111,13 @@ def live_server(tmp_path: Path) -> Iterator[tuple[str, object]]:
         sock.close()
 
 
+def _wait_released(app, timeout_s: float = 5.0) -> None:
+    deadline = time.monotonic() + timeout_s
+    while app.state.agent_busy and time.monotonic() < deadline:
+        time.sleep(0.02)
+    assert app.state.agent_busy == set()
+
+
 def _headers(base: str) -> dict[str, str]:
     return {"Authorization": f"Bearer {TOKEN}", "Origin": base}
 
@@ -127,7 +134,9 @@ def test_concurrent_second_send_is_409_over_real_socket(live_server):
             assert second.json()["code"] == "agent_busy"
             rest = "\n".join(lines)  # the first turn still completes
         assert "turn_finished" in rest
-        assert app.state.agent_busy == set()
+        # The server releases admission just after its last write; the client can see the last
+        # event first, so wait briefly instead of asserting at once.
+        _wait_released(app)
         assert c.post(MESSAGES, json={"text": "third"}).status_code == 200
 
 
@@ -139,10 +148,7 @@ def test_client_disconnect_releases_admission(live_server):
             next(lines)
             assert app.state.agent_busy == {"petfood-de"}
         # Closed after one event; the server notices the disconnect and releases admission.
-        deadline = time.monotonic() + 5
-        while app.state.agent_busy and time.monotonic() < deadline:
-            time.sleep(0.05)
-        assert app.state.agent_busy == set()
+        _wait_released(app)
         assert c.post(MESSAGES, json={"text": "again"}).status_code == 200
 
 
