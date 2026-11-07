@@ -55,7 +55,7 @@ none
 - [ ] A3 The README records these numbers: naive OLS of sales on discount is biased by more than 30%, and adding the mediator to the controls biases the estimate (C3).
 - [ ] A4 Every truth column is listed in `truth.yaml` and uses the `truth_` prefix (C4).
 - [ ] A5 `generate-bundle --seeds 1..20` produces the coverage set in under 2 minutes. Only seed 1 is committed, under 5 MB (C14).
-- [ ] A6 Region × week heterogeneity is documented: festival weeks have higher ROI and the low season has negative ROI (C14).
+- [ ] A6 Region × week heterogeneity is documented: holiday weeks have higher ROI and the low season has negative ROI (C14).
 
 Verification, automated: `uv run pytest tests/sample` exits 0 (offline).
 Verification, manual: none.
