@@ -36,8 +36,8 @@ A pure, tested library turns a DAG plus mapping into an identification verdict a
 
 ## Scope
 
-- In: - `causal/dag.py`: pydantic models with a YAML round trip and networkx. - `identify.py`: descendants of the treatment; backdoor check via `networkx` d-separation on the graph with the treatment's out-edges removed; unobserved nodes on open paths; rule thresholds. - `compile.py`: the table in design §5, producing `PipelineConfig` as canonical JSON with sorted keys. - `forbidden.py`: the deny-list, the only allowlisted file for the literal.
-- Route: - `causal/dag.py`: pydantic models with a YAML round trip and networkx. - `identify.py`: descendants of the treatment; backdoor check via `networkx` d-separation on the graph with the treatment's out-edges removed; unobserved nodes on open paths; rule thresholds. - `compile.py`: the table in design §5, producing `PipelineConfig` as canonical JSON with sorted keys. - `forbidden.py`: the deny-list, the only allowlisted file for the literal.
+- In: - `causal/dag.py`: pydantic models with a YAML round trip and networkx. - `identify.py`: descendants of the treatment; backdoor check via `networkx` d-separation on the graph with the treatment's out-edges removed; unobserved nodes on open paths; rule thresholds. - `compile.py`: the table in design §5, producing `PipelineConfig` as canonical JSON with sorted keys. - `forbidden.py`: the deny-list. It holds the truth prefix only base64-encoded, like the guard, and a test asserts the two encoded constants are equal (D13, revised 2026-11-07).
+- Route: - `causal/dag.py`: pydantic models with a YAML round trip and networkx. - `identify.py`: descendants of the treatment; backdoor check via `networkx` d-separation on the graph with the treatment's out-edges removed; unobserved nodes on open paths; rule thresholds. - `compile.py`: the table in design §5, producing `PipelineConfig` as canonical JSON with sorted keys. - `forbidden.py`: the deny-list, holding the prefix only encoded (D13).
 - Depth: MVP depth per design §3; floor kept (no secrets, spend stop, pinned models).
 
 ## Constraints

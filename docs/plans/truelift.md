@@ -121,6 +121,17 @@ Result:
 - Coverage grid: every cell cites an acceptance item or gives an n/a reason.
 - Security rules: 17/25 cited; 8 are n/a or deferred with reasons.
 
+**Changes at checkpoint 1 (2026-11-07, after G01):** all eight G01 rulings were accepted by Ruslan. No contract changed, no estimate moved, and nothing was removed or weakened.
+
+| Change | Why |
+| --- | --- |
+| D13 revised: the truth prefix is stored only base64-encoded, in the guard and in G06's `forbidden.py` (G01 R1) | The literal never enters the public repo, its history or packages; stricter than D13 as first written |
+| D13 revised: case-insensitive stem match; only the top-level `private/` is denied; the guard's four modes are named (G01 R2–R4) | Recorded what G01 built so later goals rely on it |
+| Python pinned `>=3.12,<3.13` (G01 R5) | Matches the release unit; G23 widens it |
+| SB15: pip-audit fails on any known vulnerability, and exceptions are named in the `Makefile` (G01 R8) | pip-audit cannot filter by severity; stricter than "high" |
+| Repo conventions: `make e2e` fails with "no tests ran" until G20; `scripts/tickets_to_github.py` stays outside ruff until a change of its own (G01 R6, R7) | Never report a pass that did not happen; keep G01 inside its touches |
+| G06 scope line: `forbidden.py` holds the encoded prefix and tests it against the guard's | Follows from R1 |
+
 **Changes after the first failing run:**
 
 | Change | Why |
@@ -148,7 +159,7 @@ No dependency, wait or review was removed.
   security: [SB15, SB16]
   mentions_only: []
   type: implementation
-  status: planned
+  status: done
 - goal: G02
   phase: 1
   hands_on: 2-3
@@ -580,7 +591,7 @@ G02 writes this table into `AGENTS.md` with the resolved pins; after that, this 
 
 | ID and goal | Phase | Type | Human hours | Depends on | Primary skill | State |
 | --- | --- | --- | --- | --- | --- | --- |
-| [G01](../tickets/truelift/G01-repo-foundation-and-confidentiality-guard.md) Repo foundation and confidentiality guard | 1 | implementation | 2–4 | — | `adk-release-engineering` | ready |
+| [G01](../tickets/truelift/G01-repo-foundation-and-confidentiality-guard.md) Repo foundation and confidentiality guard | 1 | implementation | 2–4 | — | `adk-release-engineering` | done |
 | [G02](../tickets/truelift/G02-api-skeleton-localhost-auth-stream-contract-and.md) API skeleton, localhost auth, stream contract, generated client | 1 | implementation | 3–5 | G01 | `adk-fastapi-backend` | proposed |
 | [G03](../tickets/truelift/G03-pipeline-feasibility-spike.md) Pipeline feasibility spike | 1 | discovery | 2.5–5 | G01 | `adk-engineer` | proposed |
 | [G04](../tickets/truelift/G04-synthetic-market-generator-and-truth.md) Synthetic market generator and truth | 1 | implementation | 6–10 | G01 | `adk-agent-evaluation` | proposed |
@@ -680,11 +691,11 @@ Detail follows certainty: these goals will be refined after W1. The steps from f
 
 ## Resume here
 
-- **Next goal:** G01, repo foundation and confidentiality guard. It depends on nothing, and everything else depends on it.
-- **Read first:** [docs/architecture/truelift.md](../architecture/truelift.md) §3–5, this plan's G01, `.gitignore`.
-- **Next action:** Create `pyproject.toml` with uv, then the guard script with its fixture tests, then the CI workflow.
-- **Schedule check:** run 2026-11-05, exit 0 at 235 days; results in *Schedule check*.
-- **Independent review: not yet done.** This plan is for three people, so someone who did not write it should review it before G02 starts. G01 can begin meanwhile. Run the following in a fresh session (paths filled in), then settle each finding in this plan's change table:
+- **Done:** G01 (PR #28, merged 2026-11-06; checkpoint 1 settled its rulings on 2026-11-07). Phase 1 base commit: `a10dfe5`.
+- **Ready now:** G02, G03, G04, G05 (in parallel) and G08 (after G02: both write `src/truelift/api/routes/projects.py`). Pick through the `pick-ticket` skill ("what can I grab?").
+- **Read first:** [docs/architecture/truelift.md](../architecture/truelift.md) §3–5, `AGENTS.md`, the ticket.
+- **Schedule check:** run 2026-11-05, exit 0 at 235 days; results in *Schedule check*. G01 finished inside its estimate (actual hours not reported).
+- **Independent review: not yet done.** This plan is for three people, so someone who did not write it should review it before G02 starts. Run the following in a fresh session (paths filled in), then settle each finding in this plan's change table:
 
 ```text
 Review a delivery plan you did not write. Read, in full: the design docs/architecture/truelift.md and the plan docs/plans/truelift.md (no tickets directory). Do not edit them. Report findings only.
@@ -697,14 +708,6 @@ The schedule block in the plan is the plan as it will run, and ~/.claude/skills/
 Also check the confidentiality rule (C13): the two documents must not quote the hackathon notebook, deck or dataset beyond ROI 2.50 and 1.64 [-1.64, 4.92].
 Return a table: finding, evidence (file and text), effect on finish, suggested fix.
 ```
-- **Continuation prompt:**
-
-```text
-/adk-engineer Carry out G01 (Repo foundation and confidentiality guard) from docs/plans/truelift.md.
-Read docs/architecture/truelift.md and preserve its accepted decisions.
-Use adk-release-engineering with adk-tool-auth-and-secrets.
-Work within the local repository and GitHub Actions; do not publish packages.
-Verify A1–A6 and record evidence in the plan.
-```
+- **Continuation prompt:** take a ready ticket with "what can I grab?", then run the prompt in its *Run this ticket* section.
 
 After that goal: `/adk-engineer Continue the next ready goal in docs/plans/truelift.md.`

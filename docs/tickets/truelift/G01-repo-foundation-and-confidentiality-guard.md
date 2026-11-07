@@ -97,14 +97,14 @@ Companion skills: none (`companion_skills: []`).
 Specialists: `adk-release-engineering` 2026.10.28 is primary, and `adk-tool-auth-and-secrets` 2026.10.28 supports. The two versions match.
 
 Rulings:
-- R1. The guard stores the truth prefix base64-encoded, so the literal is nowhere in the repository, not even in the guard. D13 allowed the literal in the guard; this is stricter. G06's `forbidden.py` may import `TRUTH_PREFIX` from the guard or keep its own literal, since it is allowlisted. Cost if wrong: none to the contract.
-- R2. The prefix matches case-insensitively on its stem, without the trailing separator. This is stricter, and a false positive is possible but unlikely.
-- R3. `--tree` scans tracked files plus untracked files that are not ignored, so `make check` catches a new file before it is staged. `--history` scans every blob reachable from any ref.
-- R4. Only the top-level `private/` is denied. `tests/private/` (plan layout) is allowed.
-- R5. `requires-python = ">=3.12,<3.13"` matches the pinned release unit. G23 widens it if needed.
-- R6. `make e2e` runs `pytest -m e2e`. It exits 5 ("no tests ran") until G20 adds tests, so it never reports a pass that did not happen.
-- R7. `scripts/tickets_to_github.py` already existed and is excluded from ruff (`extend-exclude`). Lint it in its own change.
-- R8. pip-audit is stricter than "high" (see A5). Any ignore must be a named `--ignore-vuln` with a reason.
+- R1. The guard stores the truth prefix base64-encoded, so the literal is nowhere in the repository, not even in the guard. D13 allowed the literal in the guard; this is stricter. G06's `forbidden.py` may import `TRUTH_PREFIX` from the guard or keep its own literal, since it is allowlisted. Cost if wrong: none to the contract. settled: D13 (revised 2026-11-07).
+- R2. The prefix matches case-insensitively on its stem, without the trailing separator. This is stricter, and a false positive is possible but unlikely. settled: D13 (revised 2026-11-07).
+- R3. `--tree` scans tracked files plus untracked files that are not ignored, so `make check` catches a new file before it is staged. `--history` scans every blob reachable from any ref. settled: D13 (revised 2026-11-07).
+- R4. Only the top-level `private/` is denied. `tests/private/` (plan layout) is allowed. settled: D13 (revised 2026-11-07).
+- R5. `requires-python = ">=3.12,<3.13"` matches the pinned release unit. G23 widens it if needed. settled: design §5 Versions (2026-11-07).
+- R6. `make e2e` runs `pytest -m e2e`. It exits 5 ("no tests ran") until G20 adds tests, so it never reports a pass that did not happen. settled: plan change table, checkpoint 1 (2026-11-07).
+- R7. `scripts/tickets_to_github.py` already existed and is excluded from ruff (`extend-exclude`). Lint it in its own change. settled: plan change table, checkpoint 1 (2026-11-07).
+- R8. pip-audit is stricter than "high" (see A5). Any ignore must be a named `--ignore-vuln` with a reason. settled: SB15 (revised 2026-11-07).
 
 Controls left out at this profile: severity-based audit thresholds, SBOM generation, signed releases and wheel-content checks on PyPI upload. No goal publishes to PyPI. The release ticket adds these if publishing is ever authorised.
 
