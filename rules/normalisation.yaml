@@ -1,0 +1,63 @@
+# Normalisation table (decision D3, design section 5 "DAG and mapping -> doubleml-pipeline").
+#
+# Owner: Thao (CODEOWNERS). The compiler (G06) puts each control column and CATE covariate into
+# one CausalDataScaler list (doubleml-pipeline 0.2.3) by its semantic type, which the user
+# confirms at mapping time (G07). Types are the intake vocabulary (SemanticType in the API).
+#
+# Scope: control columns (x_cols) and CATE covariates only. The outcome, the treatment and the
+# treatment spend are never scaled in v1: ROI is money divided by money, and scaling either
+# side would change its units.
+
+schema: truelift.rules.normalisation/1
+
+applies_to: [x_cols, cate_covariates]
+never_scaled_roles: [outcome, treatment_rate, treatment_spend, population, date, region, category]
+
+# Scaler lists that are never used, with the reason.
+forbidden_scalers:
+  standardize_cols: >-
+    Centring on the mean flips the sign of below-average values, which a per-capita or
+    spend-like quantity never has.
+  population_standardize_cols: >-
+    Same as standardize_cols, after dividing by population.
+  min_max_cols: >-
+    Squeezing into [0, 1] by the observed range breaks as soon as a new week falls outside it.
+
+# Semantic type -> scaler list, depending on whether the mapping has a population column.
+# bounded_0_1, when present, overrides both for a column whose values all lie in [0, 1].
+# "none" keeps the column as is; "not_a_feature" means it can never be a control or a covariate.
+types:
+  money:
+    with_population: population_median_normalize_cols
+    without_population: median_normalize_cols
+    rationale: >-
+      Regional totals such as sales or media spend grow with the region's size; per-capita values
+      make regions comparable. Unit prices do not grow with size and should be typed as index.
+  volume:
+    with_population: population_median_normalize_cols
+    without_population: median_normalize_cols
+    rationale: Same as money.
+  count:
+    with_population: median_normalize_cols
+    without_population: median_normalize_cols
+    rationale: >-
+      Counts such as stores or listings are not per-person quantities; dividing by the median keeps
+      them on a comparable scale.
+  rate:
+    with_population: median_normalize_cols
+    without_population: median_normalize_cols
+    bounded_0_1: none
+    rationale: >-
+      A share between 0 and 1 is already on a common scale. A rate in other units (percent,
+      per thousand) is divided by its median.
+  index:
+    with_population: median_normalize_cols
+    without_population: median_normalize_cols
+    rationale: GRPs, price indices and sentiment indices are divided by their median.
+  flag:
+    with_population: none
+    without_population: none
+    rationale: A 0/1 flag is left as it is.
+  date: {with_population: not_a_feature, without_population: not_a_feature, rationale: Panel key.}
+  key: {with_population: not_a_feature, without_population: not_a_feature, rationale: Panel key.}
+  text: {with_population: not_a_feature, without_population: not_a_feature, rationale: Not numeric.}

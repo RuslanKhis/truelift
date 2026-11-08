@@ -1,0 +1,150 @@
+# Business-type template (decisions D3, D5, D18). Owner: Thao (CODEOWNERS).
+# See brand_via_retailers.yaml for how the DAG builder (G31) uses a template.
+
+schema: truelift.template/1
+id: online_shop
+title: An online shop that sells directly to customers
+description: >-
+  You sell through your own website or app and deliver to customers' homes. Your discounts are
+  sitewide sales, discount codes or reduced prices on some products, usually announced by email,
+  on social media or in paid ads. Regions are where your customers live.
+treatment: discount
+outcome: sales
+
+nodes:
+  - {id: discount, label: Your discount, role: treatment, usually_observed: true}
+  - {id: sales, label: Your sales, role: outcome, usually_observed: true}
+  - {id: holiday_weeks, label: Holiday weeks and shopping days such as Black Friday, role: confounder, usually_observed: true, may_modify_effect: true}
+  - {id: season, label: The time of year, role: confounder, usually_observed: true, may_modify_effect: true}
+  - {id: market_demand, label: How much people want to buy in your category, role: confounder, usually_observed: false}
+  - {id: inventory_age, label: Ageing stock, role: confounder, usually_observed: false}
+  - {id: recent_sales_trend, label: A slow or strong spell in your recent sales, role: confounder, usually_observed: true}
+  - {id: media, label: Your paid advertising, role: confounder, usually_observed: true}
+  - {id: price_changes, label: Changes to your regular prices, role: confounder, usually_observed: true}
+  - {id: competitor_promo, label: Competitors' promotions, role: predictor, usually_observed: false}
+  - {id: macro_conditions, label: The economic mood, role: predictor, usually_observed: false}
+  - {id: newsletter_sends, label: Emails announcing the offer, role: mediator, usually_observed: true}
+  - {id: site_visits, label: Visits to your shop, role: mediator, usually_observed: true}
+  - {id: branded_search, label: People searching for your brand, role: mediator, usually_observed: true}
+
+edges:
+  - from: discount
+    to: sales
+    default: present
+    sentence: Your discount changes how much you sell.
+    confirmed_by: [m3.discount_drivers]
+  - from: holiday_weeks
+    to: discount
+    default: present
+    sentence: You run discounts on shopping days such as Black Friday and in holiday weeks.
+    confirmed_by: [m2.calendar_events, m3.discount_drivers]
+  - from: holiday_weeks
+    to: sales
+    default: present
+    sentence: Holiday weeks and shopping days lift your sales on their own, with or without a discount.
+    confirmed_by: [m2.calendar_events]
+  - from: season
+    to: discount
+    default: present
+    sentence: You discount more at some times of year than at others.
+    confirmed_by: [m2.seasons, m3.discount_drivers]
+  - from: season
+    to: sales
+    default: present
+    sentence: Your sales rise and fall with the time of year.
+    confirmed_by: [m2.seasons]
+  - from: market_demand
+    to: discount
+    default: present
+    sentence: When people buy less in your category, you discount to keep orders coming.
+    confirmed_by: [m3.slow_sales_response]
+  - from: market_demand
+    to: sales
+    default: present
+    sentence: When people buy more in your category, your sales rise too.
+    confirmed_by: [m4.sales_drivers]
+  - from: inventory_age
+    to: discount
+    default: present
+    sentence: You discount to clear stock that is getting old or out of season.
+    confirmed_by: [m3.stock_clearance]
+  - from: inventory_age
+    to: sales
+    default: present
+    sentence: Older stock sells less well on its own.
+    confirmed_by: [m3.stock_clearance]
+  - from: recent_sales_trend
+    to: discount
+    default: present
+    sentence: After a few slow weeks, you are more likely to discount.
+    confirmed_by: [m3.slow_sales_response]
+  - from: recent_sales_trend
+    to: sales
+    default: present
+    sentence: A slow or strong spell tends to carry on into the next weeks.
+    confirmed_by: [m4.sales_drivers]
+  - from: media
+    to: discount
+    default: present
+    sentence: You run discounts in the same weeks as your paid advertising.
+    confirmed_by: [m3.media_alignment]
+  - from: media
+    to: sales
+    default: present
+    sentence: Your paid advertising lifts your sales.
+    confirmed_by: [m4.media]
+  - from: price_changes
+    to: discount
+    default: present
+    sentence: When you raise your regular prices, you discount more to soften the change.
+    confirmed_by: [m4.price_changes, m3.discount_drivers]
+  - from: price_changes
+    to: sales
+    default: present
+    sentence: Changes to your regular prices change how much you sell.
+    confirmed_by: [m4.price_changes]
+  - from: competitor_promo
+    to: sales
+    default: present
+    sentence: Competitors' promotions take orders away from you.
+    confirmed_by: [m4.competitor_activity]
+  - from: competitor_promo
+    to: discount
+    default: absent
+    sentence: You discount in answer to competitors' promotions.
+    confirmed_by: [m3.competitor_response]
+  - from: macro_conditions
+    to: sales
+    default: present
+    sentence: When the economy is weak, people order less from you.
+    confirmed_by: [m2.macro_conditions]
+  - from: discount
+    to: newsletter_sends
+    default: present
+    sentence: You send emails to announce a discount.
+    confirmed_by: [m5.discount_side_effects]
+  - from: newsletter_sends
+    to: site_visits
+    default: present
+    sentence: Your emails bring people to your shop.
+    confirmed_by: [m5.discount_side_effects]
+  - from: discount
+    to: site_visits
+    default: present
+    sentence: A discount brings more people to your shop.
+    confirmed_by: [m5.discount_side_effects]
+  - from: discount
+    to: branded_search
+    default: present
+    sentence: A discount makes more people search for your brand.
+    confirmed_by: [m5.discount_side_effects]
+  - from: branded_search
+    to: site_visits
+    default: present
+    sentence: People who search for your brand visit your shop.
+    confirmed_by: [m5.discount_side_effects]
+  - from: site_visits
+    to: sales
+    default: present
+    sentence: More visits to your shop means more orders.
+    confirmed_by: [m5.discount_side_effects]

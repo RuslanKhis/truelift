@@ -1,0 +1,29 @@
+# The shape of G04's seed-1 truth.yaml, for the schema test (G05/A6). The numbers are
+# placeholders that only exercise the schema; G04 writes the real values and its own file must
+# pass the same test (test_schema_committed_sample_truth).
+schema: truelift.truth/1
+generator:
+  name: truelift.sample
+  version: 0.0.1
+  seed: 1
+  switches: {unobserved_confounder: false, heterogeneity: true}
+panel:
+  file: panel.csv
+  sha256: "0000000000000000000000000000000000000000000000000000000000000000"
+  rows: 1248
+  regions: 8
+  weeks: 156
+  date_col: week
+  geo_col: region
+treatment: {column: discount_rate, kind: percentage, spend_column: discount_spend}
+outcome: {column: revenue}
+true_roi:
+  total: 1.5
+  definition: sum_incremental_revenue_over_sum_spend
+  by_segment: {holiday_weeks: 2.0, low_season: -0.5}
+truth_columns: [truth_baseline_revenue, truth_incremental_revenue, truth_roi]
+hidden_confounders: []
+traps:
+  mediators: [store_traffic]
+  treatment_descendants: []
+confounders: [holiday, season_index, weighted_distribution, media_grps]

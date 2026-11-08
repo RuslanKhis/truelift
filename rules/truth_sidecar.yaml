@@ -1,0 +1,125 @@
+# Schema of a benchmark's truth sidecar, truth.yaml (contracts C4 and C14, decision D14).
+#
+# Owner: Thao (CODEOWNERS). The synthetic generator (G04) writes truth.yaml next to each panel;
+# the causal core (G06) reads truth_columns to keep them out of every feature list, and the
+# benchmark scorer (G10) reads true_roi. This file is a JSON Schema (draft 2020-12) written in
+# YAML; truelift.causal.rules.validate_truth() applies it.
+#
+# ROI is money ROI throughout: the sum of incremental revenue divided by the sum of discount
+# spend over the rows in scope (the G03 note, finding F1).
+
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://github.com/RuslanKhis/truelift/rules/truth_sidecar.yaml
+title: truelift benchmark truth sidecar
+type: object
+additionalProperties: false
+required: [schema, generator, panel, treatment, outcome, true_roi, truth_columns, hidden_confounders, traps]
+properties:
+  schema:
+    const: truelift.truth/1
+  generator:
+    type: object
+    additionalProperties: false
+    required: [name, version, seed, switches]
+    properties:
+      name: {type: string, minLength: 1}
+      version: {type: string, minLength: 1}
+      seed: {type: integer, minimum: 0}
+      switches:
+        type: object
+        additionalProperties: false
+        required: [unobserved_confounder, heterogeneity]
+        properties:
+          unobserved_confounder:
+            type: boolean
+            description: When true, the confounders in hidden_confounders are left out of the panel.
+          heterogeneity:
+            type: boolean
+            description: When true, ROI differs by segment and true_roi.by_segment is filled.
+  panel:
+    type: object
+    additionalProperties: false
+    required: [file, sha256, rows, regions, weeks, date_col, geo_col]
+    properties:
+      file: {type: string, pattern: "^[A-Za-z0-9_.-]+\\.csv$"}
+      sha256: {type: string, pattern: "^[0-9a-f]{64}$"}
+      rows: {type: integer, minimum: 1}
+      regions: {type: integer, minimum: 1}
+      weeks: {type: integer, minimum: 1}
+      date_col: {$ref: "#/$defs/column"}
+      geo_col: {$ref: "#/$defs/column"}
+      item_col: {$ref: "#/$defs/column"}
+  treatment:
+    type: object
+    additionalProperties: false
+    required: [column, kind, spend_column]
+    properties:
+      column: {$ref: "#/$defs/column"}
+      kind: {enum: [percentage, spend]}
+      spend_column: {$ref: "#/$defs/column"}
+  outcome:
+    type: object
+    additionalProperties: false
+    required: [column]
+    properties:
+      column: {$ref: "#/$defs/column"}
+  true_roi:
+    type: object
+    additionalProperties: false
+    required: [total, definition]
+    properties:
+      total: {type: number}
+      definition: {const: sum_incremental_revenue_over_sum_spend}
+      by_segment:
+        description: True ROI per segment, keyed by a segment name such as holiday_weeks or low_season.
+        type: object
+        propertyNames: {pattern: "^[a-z][a-z0-9_]*$"}
+        additionalProperties: {type: number}
+  truth_columns:
+    description: >-
+      Every column of the panel that holds ground truth. Each uses the truth_ prefix (G04/A4) and
+      is never a feature, a CATE covariate or part of an LLM payload (C4).
+    type: array
+    minItems: 1
+    uniqueItems: true
+    items: {type: string, pattern: "^truth_[a-z0-9_]+$"}
+  hidden_confounders:
+    description: Confounders the data-generating process has but the panel leaves out.
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [name, description]
+      properties:
+        name: {type: string, pattern: "^[a-z][a-z0-9_]*$"}
+        description: {type: string, minLength: 1}
+  traps:
+    description: Columns that look like controls but must not be (C3 a).
+    type: object
+    additionalProperties: false
+    required: [mediators]
+    properties:
+      mediators: {type: array, uniqueItems: true, items: {$ref: "#/$defs/column"}}
+      treatment_descendants: {type: array, uniqueItems: true, items: {$ref: "#/$defs/column"}}
+  confounders:
+    description: Observed columns that confound the discount and sales.
+    type: array
+    uniqueItems: true
+    items: {$ref: "#/$defs/column"}
+allOf:
+  # The unobserved-confounder switch must name what it hid (G04/A7).
+  - if:
+      properties: {generator: {properties: {switches: {properties: {unobserved_confounder: {const: true}}}}}}
+    then:
+      properties: {hidden_confounders: {minItems: 1}}
+    else:
+      properties: {hidden_confounders: {maxItems: 0}}
+  # Heterogeneity must come with the true ROI per segment (G04/A6).
+  - if:
+      properties: {generator: {properties: {switches: {properties: {heterogeneity: {const: true}}}}}}
+    then:
+      properties: {true_roi: {required: [by_segment]}}
+$defs:
+  column:
+    type: string
+    pattern: "^[A-Za-z][A-Za-z0-9_]*$"

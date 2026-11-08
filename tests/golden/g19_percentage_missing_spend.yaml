@@ -1,0 +1,40 @@
+schema: truelift.golden/1
+id: g19_percentage_missing_spend
+title: A discount rate with no spend column cannot compile
+covers: [percentage_with_spend]
+template: online_shop
+rationale: >-
+  Identification passes, but the mapping has no discount-spend column. Without spend, ROI would
+  divide money by a rate, which is meaningless (the G03 note, finding F1). The compiler refuses
+  with missing_spend_column and no config is written, so no run starts.
+dag:
+  treatment: discount
+  outcome: sales
+  nodes:
+    - {id: discount, role: treatment, column: discount_rate}
+    - {id: sales, role: outcome, column: revenue}
+    - {id: holiday_weeks, role: confounder, column: holiday}
+  edges:
+    - [discount, sales]
+    - [holiday_weeks, discount]
+    - [holiday_weeks, sales]
+mapping:
+  columns:
+    - {name: week, role: date, type: date}
+    - {name: region, role: region, type: key}
+    - {name: revenue, role: outcome, type: money}
+    - {name: discount_rate, role: treatment_rate, type: rate, bounded_0_1: true}
+    - {name: population, role: population, type: count}
+    - {name: holiday, role: control, type: flag}
+data: {weeks: 156, regions: 8, rows: 1248, treated_share: 0.35, untreated_share: 0.4, treatment_levels: 6, gap_share: 0.0}
+margin: 0.4
+expected:
+  decision: identified
+  adjustment_set: [holiday_weeks]
+  x_cols: [holiday]
+  fixed_effects: [region]
+  cate_covariates: []
+  warnings:
+    - {code: few_regions}
+  compile:
+    error: missing_spend_column

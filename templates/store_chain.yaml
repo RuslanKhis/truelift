@@ -1,0 +1,155 @@
+# Business-type template (decisions D3, D5, D18). Owner: Thao (CODEOWNERS).
+# See brand_via_retailers.yaml for how the DAG builder (G31) uses a template.
+
+schema: truelift.template/1
+id: store_chain
+title: A chain of your own shops
+description: >-
+  You run your own shops and set your own prices. Your discounts are price cuts in your shops,
+  often announced in a leaflet or in the shop window, on some products or across the range.
+treatment: discount
+outcome: sales
+
+nodes:
+  - {id: discount, label: Your discount, role: treatment, usually_observed: true}
+  - {id: sales, label: Your sales, role: outcome, usually_observed: true}
+  - {id: holiday_weeks, label: Holiday weeks, role: confounder, usually_observed: true, may_modify_effect: true}
+  - {id: season, label: The time of year, role: confounder, usually_observed: true, may_modify_effect: true}
+  - {id: market_demand, label: How much people want to buy in your category, role: confounder, usually_observed: false}
+  - {id: inventory_age, label: Ageing stock, role: confounder, usually_observed: false}
+  - {id: recent_sales_trend, label: A slow or strong spell in your recent sales, role: confounder, usually_observed: true}
+  - {id: store_count, label: How many shops you have open, role: confounder, usually_observed: true, may_modify_effect: true}
+  - {id: local_events, label: Local events and school holidays, role: confounder, usually_observed: false}
+  - {id: media, label: Your advertising, role: confounder, usually_observed: true}
+  - {id: competitor_promo, label: Competitors' promotions, role: predictor, usually_observed: false}
+  - {id: weather, label: The weather, role: predictor, usually_observed: true}
+  - {id: macro_conditions, label: The economic mood, role: predictor, usually_observed: false}
+  - {id: store_traffic, label: People coming into your shops, role: mediator, usually_observed: true}
+  - {id: basket_size, label: How much each shopper buys, role: mediator, usually_observed: true}
+
+edges:
+  - from: discount
+    to: sales
+    default: present
+    sentence: Your discount changes how much you sell.
+    confirmed_by: [m3.discount_drivers]
+  - from: holiday_weeks
+    to: discount
+    default: present
+    sentence: Holiday weeks make you discount more often or more deeply.
+    confirmed_by: [m2.calendar_events, m3.discount_drivers]
+  - from: holiday_weeks
+    to: sales
+    default: present
+    sentence: Holiday weeks lift your sales on their own, with or without a discount.
+    confirmed_by: [m2.calendar_events]
+  - from: season
+    to: discount
+    default: present
+    sentence: You discount more at some times of year than at others, for example in end-of-season sales.
+    confirmed_by: [m2.seasons, m3.discount_drivers]
+  - from: season
+    to: sales
+    default: present
+    sentence: Your sales rise and fall with the time of year.
+    confirmed_by: [m2.seasons]
+  - from: market_demand
+    to: discount
+    default: present
+    sentence: When people buy less in your category, you discount to keep shoppers coming.
+    confirmed_by: [m3.slow_sales_response]
+  - from: market_demand
+    to: sales
+    default: present
+    sentence: When people buy more in your category, your sales rise too.
+    confirmed_by: [m4.sales_drivers]
+  - from: inventory_age
+    to: discount
+    default: present
+    sentence: You discount to clear stock that is getting old or out of season.
+    confirmed_by: [m3.stock_clearance]
+  - from: inventory_age
+    to: sales
+    default: present
+    sentence: Older stock sells less well on its own.
+    confirmed_by: [m3.stock_clearance]
+  - from: recent_sales_trend
+    to: discount
+    default: present
+    sentence: After a few slow weeks, you are more likely to discount.
+    confirmed_by: [m3.slow_sales_response]
+  - from: recent_sales_trend
+    to: sales
+    default: present
+    sentence: A slow or strong spell tends to carry on into the next weeks.
+    confirmed_by: [m4.sales_drivers]
+  - from: store_count
+    to: discount
+    default: present
+    sentence: You run opening offers when new shops open.
+    confirmed_by: [m4.store_network, m3.discount_drivers]
+  - from: store_count
+    to: sales
+    default: present
+    sentence: More open shops means more sales.
+    confirmed_by: [m4.store_network]
+  - from: local_events
+    to: discount
+    default: present
+    sentence: You time discounts around local events and school holidays.
+    confirmed_by: [m2.local_events, m3.discount_drivers]
+  - from: local_events
+    to: sales
+    default: present
+    sentence: Local events and school holidays change how many people shop.
+    confirmed_by: [m2.local_events]
+  - from: media
+    to: discount
+    default: present
+    sentence: You advertise in the same weeks as your discounts, for example with a leaflet.
+    confirmed_by: [m3.media_alignment]
+  - from: media
+    to: sales
+    default: present
+    sentence: Your advertising lifts your sales.
+    confirmed_by: [m4.media]
+  - from: competitor_promo
+    to: sales
+    default: present
+    sentence: Competitors' promotions take shoppers away from you.
+    confirmed_by: [m4.competitor_activity]
+  - from: competitor_promo
+    to: discount
+    default: absent
+    sentence: You discount in answer to competitors' promotions.
+    confirmed_by: [m3.competitor_response]
+  - from: weather
+    to: sales
+    default: present
+    sentence: The weather changes how many people go shopping.
+    confirmed_by: [m2.weather]
+  - from: macro_conditions
+    to: sales
+    default: present
+    sentence: When the economy is weak, people spend less in your shops.
+    confirmed_by: [m2.macro_conditions]
+  - from: discount
+    to: store_traffic
+    default: present
+    sentence: A discount brings more people into your shops.
+    confirmed_by: [m5.discount_side_effects]
+  - from: store_traffic
+    to: sales
+    default: present
+    sentence: More people in your shops means more sales.
+    confirmed_by: [m5.discount_side_effects]
+  - from: discount
+    to: basket_size
+    default: present
+    sentence: During a discount, shoppers put more in their basket.
+    confirmed_by: [m5.discount_side_effects]
+  - from: basket_size
+    to: sales
+    default: present
+    sentence: Bigger baskets mean more sales.
+    confirmed_by: [m5.discount_side_effects]

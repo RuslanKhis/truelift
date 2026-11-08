@@ -1,0 +1,38 @@
+schema: truelift.golden/1
+id: g05_descendant_not_mediator
+title: Promotion shipments follow the discount and are not a control
+covers: [treatment_descendant]
+template: brand_via_retailers
+rationale: >-
+  Extra stock is shipped to retailers because a promotion is planned. The shipments do not lead
+  to sales in this DAG, but they are decided by the discount, so as a control they would soak
+  up part of the discount's own variation. Back-door adjustment never uses anything the
+  treatment causes, so the label "sales driver" is a contradiction and the run is blocked.
+dag:
+  treatment: discount
+  outcome: sales
+  nodes:
+    - {id: discount, role: treatment, column: discount_rate}
+    - {id: sales, role: outcome, column: revenue}
+    - {id: holiday_weeks, role: confounder, column: holiday}
+    - {id: promo_shipments, role: predictor, column: promo_shipped_units}
+  edges:
+    - [discount, sales]
+    - [discount, promo_shipments]
+    - [holiday_weeks, discount]
+    - [holiday_weeks, sales]
+mapping:
+  columns:
+    - {name: week, role: date, type: date}
+    - {name: region, role: region, type: key}
+    - {name: revenue, role: outcome, type: money}
+    - {name: discount_rate, role: treatment_rate, type: rate, bounded_0_1: true}
+    - {name: discount_spend, role: treatment_spend, type: money}
+    - {name: population, role: population, type: count}
+    - {name: holiday, role: control, type: flag}
+    - {name: promo_shipped_units, role: control, type: volume}
+data: {weeks: 156, regions: 8, rows: 1248, treated_share: 0.35, untreated_share: 0.4, treatment_levels: 6, gap_share: 0.0}
+expected:
+  decision: blocked
+  blocks:
+    - {code: descendant_in_controls, node_ids: [promo_shipments]}

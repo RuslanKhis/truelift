@@ -1,0 +1,60 @@
+schema: truelift.golden/1
+id: g25_normalisation_without_population
+title: Scalers when the panel has no population column
+covers: [normalisation]
+template: store_chain
+rationale: >-
+  Without a population column, per-capita scaling is impossible, so money and volume controls
+  fall back to the median (rules/normalisation.yaml). Store counts and a rate in percent are
+  divided by their median; the holiday flag and the online share, a rate in [0, 1], stay as
+  they are. The outcome, discount and spend are never scaled.
+dag:
+  treatment: discount
+  outcome: sales
+  nodes:
+    - {id: discount, role: treatment, column: discount_rate}
+    - {id: sales, role: outcome, column: revenue}
+    - {id: holiday_weeks, role: confounder, column: holiday}
+    - {id: media, role: confounder, column: media_spend}
+    - {id: store_count, role: confounder, column: open_stores}
+    - {id: macro_conditions, role: confounder, column: unemployment_pct}
+    - {id: channel_mix, role: predictor, column: online_share}
+  edges:
+    - [discount, sales]
+    - [holiday_weeks, discount]
+    - [holiday_weeks, sales]
+    - [media, discount]
+    - [media, sales]
+    - [store_count, discount]
+    - [store_count, sales]
+    - [macro_conditions, discount]
+    - [macro_conditions, sales]
+    - [channel_mix, sales]
+mapping:
+  columns:
+    - {name: week, role: date, type: date}
+    - {name: region, role: region, type: key}
+    - {name: revenue, role: outcome, type: money}
+    - {name: discount_rate, role: treatment_rate, type: rate, bounded_0_1: true}
+    - {name: discount_spend, role: treatment_spend, type: money}
+    - {name: holiday, role: control, type: flag}
+    - {name: media_spend, role: control, type: money}
+    - {name: open_stores, role: control, type: count}
+    - {name: unemployment_pct, role: control, type: rate}
+    - {name: online_share, role: control, type: rate, bounded_0_1: true}
+data: {weeks: 156, regions: 8, rows: 1248, treated_share: 0.35, untreated_share: 0.4, treatment_levels: 6, gap_share: 0.0}
+expected:
+  decision: identified
+  adjustment_set: [channel_mix, holiday_weeks, macro_conditions, media, store_count]
+  x_cols: [holiday, media_spend, online_share, open_stores, unemployment_pct]
+  fixed_effects: [region]
+  cate_covariates: []
+  warnings:
+    - {code: few_regions}
+  compile:
+    treatment_types: {discount_rate: percentage}
+    sales_col: revenue
+    treatment_spend_cols: {discount_rate: discount_spend}
+    opt_threshold_roi: 1.0
+    scalers:
+      median_normalize_cols: [media_spend, open_stores, unemployment_pct]

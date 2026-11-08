@@ -251,7 +251,7 @@ No dependency, wait or review was removed.
   security: []
   mentions_only: [G04]
   type: implementation
-  status: planned
+  status: done
 - goal: G06
   phase: 1
   hands_on: 4-6
@@ -634,7 +634,7 @@ G02 wrote the companion table into [`AGENTS.md`](../../AGENTS.md#companion-skill
 | [G02](../tickets/truelift/G02-api-skeleton-localhost-auth-stream-contract-and.md) API skeleton, localhost auth, stream contract, generated client | 1 | implementation | 3–5 (actual 0.5) | G01 | `adk-fastapi-backend` | done |
 | [G03](../tickets/truelift/G03-pipeline-feasibility-spike.md) Pipeline feasibility spike | 1 | discovery | 2.5–5 | G01 | `adk-engineer` | done |
 | [G04](../tickets/truelift/G04-synthetic-market-generator-and-truth.md) Synthetic market generator and truth | 1 | implementation | 6–10 | G01 | `adk-agent-evaluation` | ready |
-| [G05](../tickets/truelift/G05-rules-dag-templates-and-golden-cases.md) Rules, DAG templates and golden cases | 1 | implementation | 5–8 | G01 | `adk-agent-evaluation` | ready |
+| [G05](../tickets/truelift/G05-rules-dag-templates-and-golden-cases.md) Rules, DAG templates and golden cases | 1 | implementation | 5–8 | G01 | `adk-agent-evaluation` | done |
 | [G06](../tickets/truelift/G06-causal-core-dag-identification-and-config-compil.md) Causal core: DAG, identification, compiler | 1 | implementation | 5–8 | G03, G05 | `adk-workflow-design` | proposed |
 | G07 Data intake, profiling and mapping validation | 1 | implementation | 4–6.5 | G02, G05, G06, G08 | `adk-fastapi-backend` | proposed |
 | [G08](../tickets/truelift/G08-project-store-knowledge-markdown-versions-and-sq.md) Project store: knowledge Markdown, versions, SQLite | 1 | implementation | 4.5–7.5 | G02 | `adk-memory-architecture` | proposed |

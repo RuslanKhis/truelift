@@ -1,0 +1,43 @@
+schema: truelift.golden/1
+id: g24_forbidden_truth_column
+title: A ground-truth column is mapped to a sales driver
+covers: [forbidden_column]
+template: online_shop
+rationale: >-
+  A benchmark panel carries truth_baseline_sales, the sales the generator would have produced
+  without any discount. It predicts sales perfectly and must never be a feature (C4). The node
+  is treated as having no data: it only drives sales, so identification still passes, the
+  column is excluded, and the user sees "ground truth: excluded".
+dag:
+  treatment: discount
+  outcome: sales
+  nodes:
+    - {id: discount, role: treatment, column: discount_rate}
+    - {id: sales, role: outcome, column: revenue}
+    - {id: holiday_weeks, role: confounder, column: holiday}
+    - {id: baseline_demand, role: predictor, column: truth_baseline_sales}
+  edges:
+    - [discount, sales]
+    - [holiday_weeks, discount]
+    - [holiday_weeks, sales]
+    - [baseline_demand, sales]
+mapping:
+  columns:
+    - {name: week, role: date, type: date}
+    - {name: region, role: region, type: key}
+    - {name: revenue, role: outcome, type: money}
+    - {name: discount_rate, role: treatment_rate, type: rate, bounded_0_1: true}
+    - {name: discount_spend, role: treatment_spend, type: money}
+    - {name: population, role: population, type: count}
+    - {name: holiday, role: control, type: flag}
+    - {name: truth_baseline_sales, role: control, type: money}
+data: {weeks: 156, regions: 8, rows: 1248, treated_share: 0.35, untreated_share: 0.4, treatment_levels: 6, gap_share: 0.0}
+expected:
+  decision: identified
+  adjustment_set: [holiday_weeks]
+  x_cols: [holiday]
+  fixed_effects: [region]
+  cate_covariates: []
+  warnings:
+    - {code: few_regions}
+    - {code: forbidden_excluded, subjects: [truth_baseline_sales]}
