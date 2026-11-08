@@ -1,0 +1,51 @@
+schema: truelift.golden/1
+id: g08_proxy_accepted
+title: Category sales excluding the brand stand in for demand
+covers: [proxy_accepted, normalisation]
+template: brand_via_retailers
+rationale: >-
+  Same DAG as g07, but the user accepted the proxy rule category_sales_excl_own: a column of
+  category sales that leaves out the brand's own sales. Demand now counts as having data, the
+  proxy column becomes a control, and the caveat is shown. Category sales are a regional money
+  total, so they are divided by population before the median.
+dag:
+  treatment: discount
+  outcome: sales
+  nodes:
+    - {id: discount, role: treatment, column: discount_rate}
+    - {id: sales, role: outcome, column: revenue}
+    - {id: holiday_weeks, role: confounder, column: holiday}
+    - {id: market_demand, role: confounder, proxy: {column: category_sales_excl_own, rule: category_sales_excl_own}}
+  edges:
+    - [discount, sales]
+    - [holiday_weeks, discount]
+    - [holiday_weeks, sales]
+    - [market_demand, discount]
+    - [market_demand, sales]
+mapping:
+  columns:
+    - {name: week, role: date, type: date}
+    - {name: region, role: region, type: key}
+    - {name: revenue, role: outcome, type: money}
+    - {name: discount_rate, role: treatment_rate, type: rate, bounded_0_1: true}
+    - {name: discount_spend, role: treatment_spend, type: money}
+    - {name: population, role: population, type: count}
+    - {name: holiday, role: control, type: flag}
+    - {name: category_sales_excl_own, role: control, type: money}
+data: {weeks: 156, regions: 8, rows: 1248, treated_share: 0.35, untreated_share: 0.4, treatment_levels: 6, gap_share: 0.0}
+expected:
+  decision: identified
+  adjustment_set: [holiday_weeks, market_demand]
+  x_cols: [category_sales_excl_own, holiday]
+  fixed_effects: [region]
+  cate_covariates: []
+  warnings:
+    - {code: few_regions}
+    - {code: proxy_used, subjects: [market_demand]}
+  compile:
+    treatment_types: {discount_rate: percentage}
+    sales_col: revenue
+    treatment_spend_cols: {discount_rate: discount_spend}
+    opt_threshold_roi: 1.0
+    scalers:
+      population_median_normalize_cols: [category_sales_excl_own]

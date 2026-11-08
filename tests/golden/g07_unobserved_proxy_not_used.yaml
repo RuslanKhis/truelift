@@ -1,0 +1,38 @@
+schema: truelift.golden/1
+id: g07_unobserved_proxy_not_used
+title: Category demand is unobserved and no stand-in was accepted
+covers: [unobserved_no_proxy]
+template: brand_via_retailers
+rationale: >-
+  The brand discounts when the category is slow, and category demand drives sales. There is no
+  column for demand and the user has not accepted a stand-in, so the run is blocked. Unlike g06,
+  an approved proxy rule exists (category sales excluding the brand), so the block also offers
+  "use a stand-in".
+dag:
+  treatment: discount
+  outcome: sales
+  nodes:
+    - {id: discount, role: treatment, column: discount_rate}
+    - {id: sales, role: outcome, column: revenue}
+    - {id: holiday_weeks, role: confounder, column: holiday}
+    - {id: market_demand, role: confounder}
+  edges:
+    - [discount, sales]
+    - [holiday_weeks, discount]
+    - [holiday_weeks, sales]
+    - [market_demand, discount]
+    - [market_demand, sales]
+mapping:
+  columns:
+    - {name: week, role: date, type: date}
+    - {name: region, role: region, type: key}
+    - {name: revenue, role: outcome, type: money}
+    - {name: discount_rate, role: treatment_rate, type: rate, bounded_0_1: true}
+    - {name: discount_spend, role: treatment_spend, type: money}
+    - {name: population, role: population, type: count}
+    - {name: holiday, role: control, type: flag}
+data: {weeks: 156, regions: 8, rows: 1248, treated_share: 0.35, untreated_share: 0.4, treatment_levels: 6, gap_share: 0.0}
+expected:
+  decision: blocked
+  blocks:
+    - {code: unobserved_confounder, node_ids: [market_demand], remedies: [add_data, use_proxy, accept_risk]}

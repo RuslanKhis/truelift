@@ -1,0 +1,132 @@
+# Business-type template (decisions D3, D5, D18). Owner: Thao (CODEOWNERS).
+# See brand_via_retailers.yaml for how the DAG builder (G31) uses a template.
+
+schema: truelift.template/1
+id: food_service
+title: Restaurants, cafés or takeaways
+description: >-
+  You run places where people eat or pick up food, and you may also sell through delivery
+  apps. Your discounts are meal deals, happy hours, vouchers or offers on the delivery apps.
+treatment: discount
+outcome: sales
+
+nodes:
+  - {id: discount, label: Your discount, role: treatment, usually_observed: true}
+  - {id: sales, label: Your sales, role: outcome, usually_observed: true}
+  - {id: holiday_weeks, label: Holiday weeks, role: confounder, usually_observed: true, may_modify_effect: true}
+  - {id: season, label: The time of year, role: confounder, usually_observed: true, may_modify_effect: true}
+  - {id: local_events, label: Local events and school holidays, role: confounder, usually_observed: false}
+  - {id: delivery_platform_promos, label: Promotions the delivery apps run and part-fund, role: confounder, usually_observed: false}
+  - {id: menu_changes, label: Menu launches and changes, role: confounder, usually_observed: true}
+  - {id: recent_sales_trend, label: A slow or strong spell in your recent sales, role: confounder, usually_observed: true}
+  - {id: weather, label: The weather, role: predictor, usually_observed: true, may_modify_effect: true}
+  - {id: competitor_promo, label: Competitors' promotions, role: predictor, usually_observed: false}
+  - {id: media, label: Your advertising, role: predictor, usually_observed: true}
+  - {id: guest_visits, label: Guests and orders, role: mediator, usually_observed: true}
+
+edges:
+  - from: discount
+    to: sales
+    default: present
+    sentence: Your discount changes how much you sell.
+    confirmed_by: [m3.discount_drivers]
+  - from: holiday_weeks
+    to: discount
+    default: present
+    sentence: You run offers around holidays.
+    confirmed_by: [m2.calendar_events, m3.discount_drivers]
+  - from: holiday_weeks
+    to: sales
+    default: present
+    sentence: Holidays change how many people eat out, with or without an offer.
+    confirmed_by: [m2.calendar_events]
+  - from: season
+    to: discount
+    default: present
+    sentence: You run more offers at quiet times of year.
+    confirmed_by: [m2.seasons, m3.discount_drivers]
+  - from: season
+    to: sales
+    default: present
+    sentence: Your sales rise and fall with the time of year.
+    confirmed_by: [m2.seasons]
+  - from: local_events
+    to: discount
+    default: present
+    sentence: You time offers around local events and school holidays.
+    confirmed_by: [m2.local_events, m3.discount_drivers]
+  - from: local_events
+    to: sales
+    default: present
+    sentence: Local events and school holidays change how many guests you have.
+    confirmed_by: [m2.local_events]
+  - from: delivery_platform_promos
+    to: discount
+    default: present
+    sentence: You join the delivery apps' promotion weeks.
+    confirmed_by: [m3.discount_drivers]
+  - from: delivery_platform_promos
+    to: sales
+    default: present
+    sentence: The delivery apps' promotion weeks bring more orders across the app, which reach you too.
+    confirmed_by: [m4.sales_drivers]
+  - from: menu_changes
+    to: discount
+    default: present
+    sentence: You launch new dishes with an introductory offer.
+    confirmed_by: [m3.discount_drivers]
+  - from: menu_changes
+    to: sales
+    default: present
+    sentence: New dishes and menu changes change how much you sell.
+    confirmed_by: [m4.sales_drivers]
+  - from: recent_sales_trend
+    to: discount
+    default: present
+    sentence: After a few slow weeks, you are more likely to run an offer.
+    confirmed_by: [m3.slow_sales_response]
+  - from: recent_sales_trend
+    to: sales
+    default: present
+    sentence: A slow or strong spell tends to carry on into the next weeks.
+    confirmed_by: [m4.sales_drivers]
+  - from: weather
+    to: sales
+    default: present
+    sentence: The weather changes how many people eat out or order in.
+    confirmed_by: [m2.weather]
+  - from: weather
+    to: discount
+    default: absent
+    sentence: You run offers when the weather keeps people at home.
+    confirmed_by: [m2.weather, m3.discount_drivers]
+  - from: competitor_promo
+    to: sales
+    default: present
+    sentence: Competitors' offers take guests away from you.
+    confirmed_by: [m4.competitor_activity]
+  - from: competitor_promo
+    to: discount
+    default: absent
+    sentence: You run offers in answer to competitors' offers.
+    confirmed_by: [m3.competitor_response]
+  - from: media
+    to: sales
+    default: present
+    sentence: Your advertising brings in more guests.
+    confirmed_by: [m4.media]
+  - from: media
+    to: discount
+    default: absent
+    sentence: You advertise in the same weeks as your offers.
+    confirmed_by: [m3.media_alignment]
+  - from: discount
+    to: guest_visits
+    default: present
+    sentence: An offer brings in more guests and orders.
+    confirmed_by: [m5.discount_side_effects]
+  - from: guest_visits
+    to: sales
+    default: present
+    sentence: More guests and orders means more sales.
+    confirmed_by: [m5.discount_side_effects]

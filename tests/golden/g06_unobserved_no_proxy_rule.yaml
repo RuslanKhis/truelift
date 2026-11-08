@@ -1,0 +1,38 @@
+schema: truelift.golden/1
+id: g06_unobserved_no_proxy_rule
+title: Retailers' promotion calendar is unobserved and has no stand-in
+covers: [unobserved_no_proxy]
+template: brand_via_retailers
+rationale: >-
+  Retailers decide which weeks the brand's promotions run, and their promotion weeks lift sales
+  on their own. No column records the retailers' calendar and no proxy rule covers it, so the
+  back-door path through it stays open. The block offers adding the data or accepting the risk;
+  a stand-in is not offered because none is approved.
+dag:
+  treatment: discount
+  outcome: sales
+  nodes:
+    - {id: discount, role: treatment, column: discount_rate}
+    - {id: sales, role: outcome, column: revenue}
+    - {id: holiday_weeks, role: confounder, column: holiday}
+    - {id: retailer_promo_calendar, role: confounder}
+  edges:
+    - [discount, sales]
+    - [holiday_weeks, discount]
+    - [holiday_weeks, sales]
+    - [retailer_promo_calendar, discount]
+    - [retailer_promo_calendar, sales]
+mapping:
+  columns:
+    - {name: week, role: date, type: date}
+    - {name: region, role: region, type: key}
+    - {name: revenue, role: outcome, type: money}
+    - {name: discount_rate, role: treatment_rate, type: rate, bounded_0_1: true}
+    - {name: discount_spend, role: treatment_spend, type: money}
+    - {name: population, role: population, type: count}
+    - {name: holiday, role: control, type: flag}
+data: {weeks: 156, regions: 8, rows: 1248, treated_share: 0.35, untreated_share: 0.4, treatment_levels: 6, gap_share: 0.0}
+expected:
+  decision: blocked
+  blocks:
+    - {code: unobserved_confounder, node_ids: [retailer_promo_calendar], remedies: [add_data, accept_risk]}

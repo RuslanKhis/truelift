@@ -1,0 +1,163 @@
+# Identification rules (contract C3, decisions D3 and D18).
+#
+# Owner: Thao (CODEOWNERS). truelift.causal.identify (G06) reads this file; the data profile (G07)
+# measures the quantities the thresholds compare against. Every threshold has a value, the
+# effect it has (block or warn) and a one-line rationale or source.
+#
+# Every block message is shown to the user as is, so it is written in business words and names
+# what is missing. Placeholders in braces are filled in by code.
+
+schema: truelift.rules.identification/1
+
+# How the adjustment set is chosen. Code applies this rule; the golden cases pin it.
+adjustment:
+  rule: ancestral_v1
+  description: >-
+    Take every node that has data (its own column or an accepted proxy) and that is an ancestor of
+    the discount or of sales, then remove the discount, sales and anything the discount causes,
+    directly or indirectly. Columns flagged as ground truth never count as data. This set blocks
+    every back-door path whenever any set built from the available data can, so when it fails
+    the run is blocked and the unobserved nodes on the open paths are named.
+  source: >-
+    van der Zander, Liskiewicz and Textor (2019), "Separators and adjustment sets in causal graphs:
+    complete criteria and an algorithmic framework", Artificial Intelligence 270, the ancestral
+    adjustment set; restricted here to non-descendants of the treatment (Pearl's back-door criterion).
+
+# Panel-size and treatment-variation thresholds (C3 c, d). Every one blocks the run.
+thresholds:
+  min_weeks:
+    value: 52
+    unit: weeks
+    rationale: >-
+      One full year, so that each season and holiday is seen at least once and can be told apart
+      from the discount calendar.
+  min_regions:
+    value: 2
+    unit: regions
+    rationale: >-
+      v1 analyses region-by-week panels (R3); with one region the discount effect cannot be
+      separated from everything else that happened in the same weeks.
+  min_rows:
+    value: 200
+    unit: region-weeks
+    rationale: >-
+      Five-fold cross-fitting then keeps at least 40 rows in each held-out fold for the sales
+      and discount models.
+  min_treated_share:
+    value: 0.10
+    unit: share of region-weeks with a discount above zero
+    rationale: >-
+      Below one week in ten, the effect rests on a handful of discount weeks and any one of them
+      can move the answer.
+  min_untreated_share:
+    value: 0.05
+    unit: share of region-weeks with no discount
+    rationale: >-
+      ROI compares discounting with not discounting; without weeks at zero the no-discount
+      baseline is an extrapolation.
+  min_treatment_levels:
+    value: 3
+    unit: distinct non-zero discount levels
+    rationale: >-
+      With one or two discount depths the response to a deeper or shallower discount is a straight
+      line through two points.
+  max_gap_share:
+    value: 0.05
+    unit: share of expected region-weeks that are missing
+    rationale: >-
+      The pipeline needs a balanced weekly panel; a few missing weeks can be filled, many cannot
+      (panel shape, C3 d).
+
+# Conditions that never block but are shown next to the headline number (C6).
+warnings:
+  few_regions:
+    below: 30
+    unit: regions
+    rationale: >-
+      doubleml-pipeline 0.2.3 warns below 30 clusters; with few regions the uncertainty range is
+      itself uncertain.
+    message: >-
+      With only {regions} regions, the uncertainty range itself is uncertain.
+  proxy_used:
+    message: >-
+      {proxy_column} stands in for {node_label}. {caveat}
+  risk_accepted:
+    message: >-
+      You chose to go ahead without data for {node_label}. The report leads with how strong a
+      missing factor would have to be to change the answer.
+  forbidden_excluded:
+    message: >-
+      {column} is ground truth and is never used in the analysis.
+  left_out:
+    message: >-
+      {node_labels} is not used: in the agreed diagram it leads to neither your discount nor your
+      sales, and controlling for it could bias the result (for example when two separate causes
+      meet in it).
+
+# Predictors of sales that are not confounders. They make the estimate more precise; G06 caps them.
+controls:
+  max_predictors:
+    value: 10
+    rationale: >-
+      Panels of a few hundred to a few thousand rows; more controls than this mostly add noise
+      to the nuisance models.
+  drop_vif_above:
+    value: 10
+    rationale: >-
+      A variance inflation factor above 10 is the usual sign that a control repeats information
+      already in the others.
+
+# Block reasons. Code picks the message by code and fills in the placeholders.
+blocks:
+  descendant_in_controls:
+    contract: C3a
+    message: >-
+      Your answers say the discount changes {node_labels}, so {node_labels} cannot also be used
+      to explain sales or the discount. Either mark it as something the discount changes, or
+      tell us the discount does not change it.
+    remedies: []
+  unobserved_confounder:
+    contract: C3b
+    message: >-
+      {node_labels} affects both when you discount and how much you sell, and we have no data for
+      it. Add weekly data for it, use an accepted stand-in, or accept the risk.
+    remedies: [add_data, use_proxy, accept_risk]
+  too_few_weeks:
+    contract: C3c
+    message: >-
+      Your data covers {weeks} weeks. We need at least {min} weeks, one full year, to tell the
+      discount apart from the seasons.
+    remedies: [add_data]
+  too_few_regions:
+    contract: C3c
+    message: >-
+      Your data has {regions} region. We need at least {min} regions to compare them.
+    remedies: [add_data]
+  too_few_rows:
+    contract: C3c
+    message: >-
+      Your data has {rows} region-weeks. We need at least {min}.
+    remedies: [add_data]
+  too_few_treated_rows:
+    contract: C3c
+    message: >-
+      Only {share} of your region-weeks had a discount. We need at least {min} to measure its
+      effect.
+    remedies: [add_data]
+  too_few_untreated_rows:
+    contract: C3c
+    message: >-
+      Only {share} of your region-weeks had no discount at all. We need at least {min} to know
+      what sales look like without one.
+    remedies: [add_data]
+  too_few_treatment_levels:
+    contract: C3c
+    message: >-
+      Your discounts came in {levels} different depths. We need at least {min} to see how sales
+      respond to a deeper or shallower discount.
+    remedies: [add_data]
+  panel_gaps:
+    contract: C3d
+    message: >-
+      {share} of the region-weeks are missing from your file. We can work with at most {max}.
+    remedies: [add_data]

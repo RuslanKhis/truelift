@@ -1,0 +1,89 @@
+# Proxy rules (contract C3 b, decisions D3 and D18).
+#
+# Owner: Thao (CODEOWNERS). A proxy is a column that stands in for a factor the user has no
+# direct data for. Identification (G06) treats a node as having data when the user accepted one
+# of these rules for it; the UI shows the caveat on the edge card and next to the result.
+#
+# Fields:
+#   stands_for       template node IDs this proxy may stand in for
+#   column_examples  what such a column usually looks like (shown to the user, never matched)
+#   semantic_types   column semantic types the proxy may have (intake vocabulary, G07)
+#   conditions       checks the user must confirm before the proxy is accepted
+#   strength         partial: captures most of the factor; weak: captures only part of it
+#   caveat           what the UI shows, in business words
+
+schema: truelift.rules.proxies/1
+
+conditions:
+  excludes_own_sales: >-
+    The figure leaves out your own sales.
+  lagged_one_week: >-
+    The value is from the week before, not the week of the discount.
+  start_of_week: >-
+    The value is measured at the start of the week, before that week's discount runs.
+  same_regions: >-
+    The figure is available for each of your regions, not only nationally.
+
+proxies:
+  - id: category_sales_excl_own
+    stands_for: [market_demand]
+    column_examples: [category_sales_excl_own, market_sales_ex_brand]
+    semantic_types: [money, volume]
+    conditions: [excludes_own_sales, same_regions]
+    strength: partial
+    caveat: >-
+      Sales of the whole category stand in for how much people want to buy. This only works if
+      the figure leaves out your own sales: your discount moves your sales, so a figure that
+      includes them would carry part of the discount effect.
+
+  - id: competitor_price_index
+    stands_for: [competitor_promo]
+    column_examples: [competitor_price_index, competitor_promo_share]
+    semantic_types: [index, rate]
+    conditions: [lagged_one_week]
+    strength: partial
+    caveat: >-
+      Last week's competitor prices stand in for competitor promotions. Competitors may answer
+      your discount in the same week, so only the previous week's value is safe to use, and a
+      promotion launched in the same week is missed.
+
+  - id: stock_cover
+    stands_for: [inventory_age]
+    column_examples: [weeks_of_cover, stock_on_hand]
+    semantic_types: [volume, count, rate]
+    conditions: [start_of_week]
+    strength: weak
+    caveat: >-
+      Stock on hand stands in for ageing stock. It shows how much stock there is, not how old it
+      is, and it must be measured before the week's discount, because discounts sell stock down.
+
+  - id: previous_weeks_sales
+    stands_for: [recent_sales_trend]
+    column_examples: [sales_last_4_weeks, revenue_lag_1]
+    semantic_types: [money, volume]
+    conditions: [lagged_one_week, same_regions]
+    strength: partial
+    caveat: >-
+      Your sales over the previous weeks stand in for a slow or strong spell. Those weeks also
+      carry the effect of earlier discounts, including sales pulled forward, so the estimate can
+      lean slightly towards zero.
+
+  - id: consumer_confidence_index
+    stands_for: [macro_conditions]
+    column_examples: [consumer_confidence, retail_sentiment_index]
+    semantic_types: [index]
+    conditions: [lagged_one_week]
+    strength: weak
+    caveat: >-
+      A national consumer-confidence index stands in for the economic mood. It moves the same way
+      in every region, so it cannot capture regional differences.
+
+  - id: public_holiday_calendar
+    stands_for: [local_events]
+    column_examples: [school_holiday, public_holiday]
+    semantic_types: [flag]
+    conditions: [same_regions]
+    strength: partial
+    caveat: >-
+      School and public holidays by region stand in for local events. Fairs, sports events and
+      store-specific events are not in the calendar.

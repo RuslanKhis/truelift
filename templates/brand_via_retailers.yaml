@@ -1,0 +1,151 @@
+# Business-type template (decisions D3, D5, D18). Owner: Thao (CODEOWNERS).
+#
+# The DAG builder (G31) starts from this template, applies the user's confirmed facts as edge
+# assertions, and shows every edge no fact supports as "assumed". Edges with default "absent"
+# are not drawn unless a fact adds them; the interview asks about them.
+#
+# Slots are named "m<module>.<slot>" after the interview modules in design section 5; G12 defines
+# each one in templates/slots.yaml.
+
+schema: truelift.template/1
+id: brand_via_retailers
+title: A brand that sells through retailers
+description: >-
+  You make a product and sell it through shops and supermarkets that you do not own. Your
+  discounts are price promotions that the retailers run, often in exchange for display space or
+  a slot in their leaflet, and you fund the price cut.
+treatment: discount
+outcome: sales
+
+nodes:
+  - {id: discount, label: Your discount, role: treatment, usually_observed: true}
+  - {id: sales, label: Your sales, role: outcome, usually_observed: true}
+  - {id: holiday_weeks, label: Holiday weeks, role: confounder, usually_observed: true, may_modify_effect: true}
+  - {id: season, label: The time of year, role: confounder, usually_observed: true, may_modify_effect: true}
+  - {id: market_demand, label: How much people want to buy in your category, role: confounder, usually_observed: false}
+  - {id: retailer_promo_calendar, label: The retailers' own promotion calendar, role: confounder, usually_observed: false}
+  - {id: inventory_age, label: Ageing stock, role: confounder, usually_observed: false}
+  - {id: recent_sales_trend, label: A slow or strong spell in your recent sales, role: confounder, usually_observed: true}
+  - {id: distribution, label: How many shops stock your product, role: confounder, usually_observed: true, may_modify_effect: true}
+  - {id: media, label: Your advertising, role: confounder, usually_observed: true}
+  - {id: competitor_promo, label: Competitors' promotions, role: predictor, usually_observed: false}
+  - {id: weather, label: The weather, role: predictor, usually_observed: true}
+  - {id: macro_conditions, label: The economic mood, role: predictor, usually_observed: false}
+  - {id: display_space, label: Extra shelf and display space, role: mediator, usually_observed: false}
+
+edges:
+  - from: discount
+    to: sales
+    default: present
+    sentence: Your discount changes how much you sell.
+    confirmed_by: [m3.discount_drivers]
+  - from: holiday_weeks
+    to: discount
+    default: present
+    sentence: Holiday weeks make you discount more often or more deeply.
+    confirmed_by: [m2.calendar_events, m3.discount_drivers]
+  - from: holiday_weeks
+    to: sales
+    default: present
+    sentence: Holiday weeks lift your sales on their own, with or without a discount.
+    confirmed_by: [m2.calendar_events]
+  - from: season
+    to: discount
+    default: present
+    sentence: You discount more at some times of year than at others.
+    confirmed_by: [m2.seasons, m3.discount_drivers]
+  - from: season
+    to: sales
+    default: present
+    sentence: Your sales rise and fall with the time of year.
+    confirmed_by: [m2.seasons]
+  - from: market_demand
+    to: discount
+    default: present
+    sentence: When people buy less in your category, you discount to keep volume.
+    confirmed_by: [m3.slow_sales_response]
+  - from: market_demand
+    to: sales
+    default: present
+    sentence: When people buy more in your category, your sales rise too.
+    confirmed_by: [m4.sales_drivers]
+  - from: retailer_promo_calendar
+    to: discount
+    default: present
+    sentence: Retailers decide in which weeks your promotions can run.
+    confirmed_by: [m3.retailer_calendar]
+  - from: retailer_promo_calendar
+    to: sales
+    default: present
+    sentence: The retailers' promotion weeks bring more shoppers into their stores, which lifts your sales too.
+    confirmed_by: [m3.retailer_calendar, m4.sales_drivers]
+  - from: inventory_age
+    to: discount
+    default: present
+    sentence: You discount to clear stock that is getting old.
+    confirmed_by: [m3.stock_clearance]
+  - from: inventory_age
+    to: sales
+    default: present
+    sentence: Older stock sells less well on its own.
+    confirmed_by: [m3.stock_clearance]
+  - from: recent_sales_trend
+    to: discount
+    default: present
+    sentence: After a few slow weeks, you are more likely to discount.
+    confirmed_by: [m3.slow_sales_response]
+  - from: recent_sales_trend
+    to: sales
+    default: present
+    sentence: A slow or strong spell tends to carry on into the next weeks.
+    confirmed_by: [m4.sales_drivers]
+  - from: distribution
+    to: discount
+    default: present
+    sentence: The more shops stock your product, the more promotions you run.
+    confirmed_by: [m4.distribution, m3.discount_drivers]
+  - from: distribution
+    to: sales
+    default: present
+    sentence: The more shops stock your product, the more you sell.
+    confirmed_by: [m4.distribution]
+  - from: media
+    to: discount
+    default: present
+    sentence: You plan discounts to run in the same weeks as your advertising.
+    confirmed_by: [m3.media_alignment]
+  - from: media
+    to: sales
+    default: present
+    sentence: Your advertising lifts your sales.
+    confirmed_by: [m4.media]
+  - from: competitor_promo
+    to: sales
+    default: present
+    sentence: Competitors' promotions take sales away from you.
+    confirmed_by: [m4.competitor_activity]
+  - from: competitor_promo
+    to: discount
+    default: absent
+    sentence: You discount in answer to competitors' promotions.
+    confirmed_by: [m3.competitor_response]
+  - from: weather
+    to: sales
+    default: present
+    sentence: The weather changes how much you sell.
+    confirmed_by: [m2.weather]
+  - from: macro_conditions
+    to: sales
+    default: present
+    sentence: When the economy is weak, people buy less of your product.
+    confirmed_by: [m2.macro_conditions]
+  - from: discount
+    to: display_space
+    default: present
+    sentence: A discount gets your product extra shelf or display space.
+    confirmed_by: [m5.discount_side_effects]
+  - from: display_space
+    to: sales
+    default: present
+    sentence: Extra shelf or display space lifts your sales.
+    confirmed_by: [m5.discount_side_effects]

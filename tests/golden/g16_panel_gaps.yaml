@@ -1,0 +1,33 @@
+schema: truelift.golden/1
+id: g16_panel_gaps
+title: Too many region-weeks are missing
+covers: [panel_shape]
+template: store_chain
+rationale: >-
+  12% of the expected region-weeks are missing from the file (for example regions that joined
+  late), above the 5% the panel can tolerate. The panel shape is invalid, so the run is blocked.
+dag:
+  treatment: discount
+  outcome: sales
+  nodes:
+    - {id: discount, role: treatment, column: discount_rate}
+    - {id: sales, role: outcome, column: revenue}
+    - {id: holiday_weeks, role: confounder, column: holiday}
+  edges:
+    - [discount, sales]
+    - [holiday_weeks, discount]
+    - [holiday_weeks, sales]
+mapping:
+  columns:
+    - {name: week, role: date, type: date}
+    - {name: region, role: region, type: key}
+    - {name: revenue, role: outcome, type: money}
+    - {name: discount_rate, role: treatment_rate, type: rate, bounded_0_1: true}
+    - {name: discount_spend, role: treatment_spend, type: money}
+    - {name: population, role: population, type: count}
+    - {name: holiday, role: control, type: flag}
+data: {weeks: 156, regions: 8, rows: 1098, treated_share: 0.35, untreated_share: 0.4, treatment_levels: 6, gap_share: 0.12}
+expected:
+  decision: blocked
+  blocks:
+    - {code: panel_gaps, remedies: [add_data]}

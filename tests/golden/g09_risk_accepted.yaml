@@ -1,0 +1,44 @@
+schema: truelift.golden/1
+id: g09_risk_accepted
+title: Ageing stock is unobserved and the user accepts the risk
+covers: [risk_accepted]
+template: store_chain
+rationale: >-
+  Ageing stock drives clearance discounts and sells less well on its own, and there is no data
+  for it. The user chose to go ahead anyway. The run is allowed, ageing stock is not a control
+  (it has no column), and the report leads with the sensitivity analysis: how strong a missing
+  factor would have to be to change the answer.
+dag:
+  treatment: discount
+  outcome: sales
+  nodes:
+    - {id: discount, role: treatment, column: discount_rate}
+    - {id: sales, role: outcome, column: revenue}
+    - {id: holiday_weeks, role: confounder, column: holiday}
+    - {id: inventory_age, role: confounder}
+  edges:
+    - [discount, sales]
+    - [holiday_weeks, discount]
+    - [holiday_weeks, sales]
+    - [inventory_age, discount]
+    - [inventory_age, sales]
+  risk_accepted: [inventory_age]
+mapping:
+  columns:
+    - {name: week, role: date, type: date}
+    - {name: region, role: region, type: key}
+    - {name: revenue, role: outcome, type: money}
+    - {name: discount_rate, role: treatment_rate, type: rate, bounded_0_1: true}
+    - {name: discount_spend, role: treatment_spend, type: money}
+    - {name: population, role: population, type: count}
+    - {name: holiday, role: control, type: flag}
+data: {weeks: 156, regions: 8, rows: 1248, treated_share: 0.35, untreated_share: 0.4, treatment_levels: 6, gap_share: 0.0}
+expected:
+  decision: identified
+  adjustment_set: [holiday_weeks]
+  x_cols: [holiday]
+  fixed_effects: [region]
+  cate_covariates: []
+  warnings:
+    - {code: few_regions}
+    - {code: risk_accepted, subjects: [inventory_age]}

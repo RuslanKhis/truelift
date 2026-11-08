@@ -1,0 +1,47 @@
+# CATE rules: which effect modifiers become CATE covariates, and the basis the pipeline fits
+# (decision D3, design section 5 "DAG and mapping -> doubleml-pipeline").
+#
+# Owner: Thao (CODEOWNERS). The compiler (G06) reads this file. doubleml-pipeline 0.2.3 builds
+# the CATE basis from cate_structure_list: for "auto_additive", each continuous covariate gets a
+# B-spline with df basis columns (patsy bs) and each 0/1 covariate one column.
+
+schema: truelift.rules.cate/1
+
+covariates:
+  eligible: >-
+    Effect modifiers the user confirmed, that have data, that the discount does not cause, and
+    that are not ground truth. With none, the run estimates the average effect only
+    (covariates_for_cate_list = [[]]).
+  max_count:
+    value: 3
+    rationale: >-
+      Each continuous covariate adds df = 3 effect parameters; three covariates keep about 100
+      region-weeks per parameter at 1,000 rows, and the few-region panels v1 targets cannot
+      support more.
+  order: >-
+    When more than max_count are eligible, keep the first max_count by column name and report
+    the rest as not used (warning cate_capped).
+
+structure:
+  type: auto_additive
+  df:
+    value: 3
+    rationale: The pipeline's default; one interior knot at degree 2.
+  include_intercept: false
+  degree:
+    default: 2
+    small_sample_rows: 1000
+    small_sample_max: 2
+    rationale: >-
+      doubleml-pipeline 0.2.3 warns that with fewer than 1,000 rows the degree should be 2 or
+      less. v1 uses 2 everywhere, the pipeline's own default; raising it above 1,000 rows is a
+      rule change for Thao.
+
+warnings:
+  cate_capped:
+    message: >-
+      You named more situations where the effect may differ than this data can support. We look
+      at {kept} and leave out {dropped}.
+  cate_small_sample:
+    message: >-
+      With {rows} region-weeks, differences between situations are estimated roughly.

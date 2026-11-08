@@ -1,0 +1,45 @@
+schema: truelift.golden/1
+id: g21_cate_modifiers
+title: Holidays and season change how well discounts work
+covers: [cate]
+template: brand_via_retailers
+rationale: >-
+  The user confirmed that discounts work differently in holiday weeks and across the year. Both
+  factors are confounders with data and are not caused by the discount, so they are controls
+  and CATE covariates. With 1,248 rows the degree is the rule file's default of 2, and there is
+  no small-sample warning.
+dag:
+  treatment: discount
+  outcome: sales
+  nodes:
+    - {id: discount, role: treatment, column: discount_rate}
+    - {id: sales, role: outcome, column: revenue}
+    - {id: holiday_weeks, role: confounder, column: holiday}
+    - {id: season, role: confounder, column: season_index}
+  edges:
+    - [discount, sales]
+    - [holiday_weeks, discount]
+    - [holiday_weeks, sales]
+    - [season, discount]
+    - [season, sales]
+  modifiers: [holiday_weeks, season]
+mapping:
+  columns:
+    - {name: week, role: date, type: date}
+    - {name: region, role: region, type: key}
+    - {name: revenue, role: outcome, type: money}
+    - {name: discount_rate, role: treatment_rate, type: rate, bounded_0_1: true}
+    - {name: discount_spend, role: treatment_spend, type: money}
+    - {name: population, role: population, type: count}
+    - {name: holiday, role: control, type: flag}
+    - {name: season_index, role: control, type: index}
+data: {weeks: 156, regions: 8, rows: 1248, treated_share: 0.35, untreated_share: 0.4, treatment_levels: 6, gap_share: 0.0}
+expected:
+  decision: identified
+  adjustment_set: [holiday_weeks, season]
+  x_cols: [holiday, season_index]
+  fixed_effects: [region]
+  cate_covariates: [holiday, season_index]
+  cate_degree: 2
+  warnings:
+    - {code: few_regions}

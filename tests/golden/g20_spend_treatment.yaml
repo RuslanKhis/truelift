@@ -1,0 +1,44 @@
+schema: truelift.golden/1
+id: g20_spend_treatment
+title: Discount measured only as money spent
+covers: [spend_treatment]
+template: food_service
+rationale: >-
+  The file records how much the offers cost each week but no discount rate. The treatment is
+  then the spend itself, compiled as a spend treatment whose spend column is the same column;
+  no sales column is needed. A 25% margin puts the break-even ROI at 1 / 0.25 = 4.
+dag:
+  treatment: discount
+  outcome: sales
+  nodes:
+    - {id: discount, role: treatment, column: offer_cost}
+    - {id: sales, role: outcome, column: revenue}
+    - {id: holiday_weeks, role: confounder, column: holiday}
+  edges:
+    - [discount, sales]
+    - [holiday_weeks, discount]
+    - [holiday_weeks, sales]
+mapping:
+  columns:
+    - {name: week, role: date, type: date}
+    - {name: region, role: region, type: key}
+    - {name: revenue, role: outcome, type: money}
+    - {name: offer_cost, role: treatment_spend, type: money}
+    - {name: population, role: population, type: count}
+    - {name: holiday, role: control, type: flag}
+data: {weeks: 156, regions: 8, rows: 1248, treated_share: 0.35, untreated_share: 0.4, treatment_levels: 6, gap_share: 0.0}
+margin: 0.25
+expected:
+  decision: identified
+  adjustment_set: [holiday_weeks]
+  x_cols: [holiday]
+  fixed_effects: [region]
+  cate_covariates: []
+  warnings:
+    - {code: few_regions}
+  compile:
+    treatment_types: {offer_cost: spend}
+    sales_col: null
+    treatment_spend_cols: {offer_cost: offer_cost}
+    opt_threshold_roi: 4.0
+    scalers: {}
