@@ -1,0 +1,4 @@
+# The committed synthetic sample is byte-exact: truth.yaml records the panel's sha256 (C14, G04/A1).
+# Keep git from converting its line endings on checkout.
+data/sample/*.csv -text
+data/sample/*.yaml -text

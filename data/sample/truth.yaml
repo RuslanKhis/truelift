@@ -1,0 +1,46 @@
+# Ground truth for the truelift synthetic market (design D14, contracts C4 and C14).
+# Written by `python -m truelift.sample generate`; do not edit by hand.
+schema: truelift.truth/1
+generator:
+  name: truelift.sample
+  version: 1.0.0
+  seed: 1
+  switches:
+    unobserved_confounder: false
+    heterogeneity: true
+panel:
+  file: panel.csv
+  sha256: 17acb6d666fa005fdaaa2a8990dc6a246e80e6112fcc147f188accf25c703552
+  rows: 1248
+  regions: 8
+  weeks: 156
+  date_col: week
+  geo_col: region
+treatment:
+  column: discount_rate
+  kind: percentage
+  spend_column: discount_spend
+outcome:
+  column: revenue
+true_roi:
+  total: 2.0085068824088306
+  definition: sum_incremental_revenue_over_sum_spend
+  by_segment:
+    holiday_weeks: 2.668553367820093
+    low_season: -0.5315975639710981
+    regular: 1.59537549565927
+truth_columns:
+- truth_baseline_revenue
+- truth_incremental_revenue
+- truth_roi
+hidden_confounders: []
+traps:
+  mediators:
+  - store_traffic
+  treatment_descendants: []
+confounders:
+- holiday
+- season_index
+- weighted_distribution
+- media_grps
+- competitor_promo
