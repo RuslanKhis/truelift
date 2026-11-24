@@ -45,8 +45,8 @@ colors:
   border: "oklch(0.915 0.003 250)"
   input: "oklch(0.62 0.008 258)"
   ring: "oklch(0.42 0.09 160)"
-  chart-1: "oklch(0.55 0.12 158)"
-  chart-2: "oklch(0.6 0.12 75)"
+  chart-1: "oklch(0.51 0.115 158)"
+  chart-2: "oklch(0.54 0.11 75)"
   chart-3: "oklch(0.5 0.1 75)"
   chart-4: "oklch(0.5 0.015 258)"
   chart-5: "oklch(0.45 0.11 155)"
@@ -412,6 +412,13 @@ components:
     backgroundColor: "{colors.chip}"
     textColor: "{colors.chip-foreground}"
     rounded: "{rounded.sm}"
+  option-selected:
+    backgroundColor: "{colors.choice}"
+    textColor: "{colors.foreground}"
+  feature-card-edge:
+    backgroundColor: "{colors.card-edge}"
+  icon-chip-fill:
+    backgroundColor: "{colors.chip-fill}"
   cta-band:
     backgroundColor: "{colors.band}"
     textColor: "{colors.band-foreground}"
@@ -570,6 +577,19 @@ components:
   dark-icon-chip:
     backgroundColor: "{colors.dark-chip}"
     textColor: "{colors.dark-chip-foreground}"
+  dark-option-selected:
+    backgroundColor: "{colors.dark-choice}"
+    textColor: "{colors.dark-foreground}"
+  dark-feature-card-edge:
+    backgroundColor: "{colors.dark-card-edge}"
+  dark-icon-chip-fill:
+    backgroundColor: "{colors.dark-chip-fill}"
+  dark-button-gold:
+    backgroundColor: "{colors.dark-gold}"
+    textColor: "{colors.dark-brand}"
+  dark-button-gold-hover:
+    backgroundColor: "{colors.dark-gold-hover}"
+    textColor: "{colors.dark-brand}"
   dark-cta-band:
     backgroundColor: "{colors.dark-band}"
     textColor: "{colors.dark-band-foreground}"
@@ -640,7 +660,7 @@ Colour token names are the shadcn CSS variable names; tokens prefixed `dark-` ar
 - **Neutral fills (monotone chrome):** `accent` (#EBEDEF) for hover rows, the theme switch and a pressed toggle, `selected` (#EFF0F2 light, #1F2123 dark) for the selected sidebar item, both with foreground text. A chosen option card (the selected provider) uses `choice` instead, a grey with a hint of green (#EAF8EC light, #1A2B21 dark), with a `primary-ink` border, so it never looks like the grey callout below it.
 - **Icon chips (component `IconChip`):** a square chip (6 px radius; 48 px with a 24 px icon on landing and project cards, 40 px with a 20 px icon in card headers) in `chip` (#FCEABE pale gold light, #3F3017 gold-brown dark) with a two-tone icon: the stroke in `chip-foreground` (#0C5C3C, 6.8:1 light; #F6E7C3, 10.4:1 dark) at 1.75 px over closed shapes filled with `chip-fill` (gold; the stroke clears 5.1:1 light and 3.5:1 dark over it). Use only icons built from closed shapes: an open axis or zigzag path fills into a stray triangle. The brand mark stays separate: a gold arrow on near-black `brand`.
 - **Outlined landing cards:** feature cards and project cards use a 1 px `card-edge` border (a soft deep green in light mode, a lifted grey-green in dark mode) instead of the hairline, so they stand out from the grey canvas; the resting shadow stays.
-- **Semantic colours (money colours only):** `success` (#217937, a brighter green than the deep main green) carries positive status; `warning` uses the deep gold (#845A0F) with its icon and word, so it never relies on colour; `info` is neutral grey (#51565C); `destructive` (#B2403D) stays red for errors only, because an error must be unmistakable. Chroma 0.15 or less (house rule). Status is always also said in words or an icon. Charts lead with green (`chart-1` #1A8656 light, #64C591 dark, used by every single-series bar and progress bar), then gold (`chart-2` #A97416), deep gold, grey and deep green.
+- **Semantic colours (money colours only):** `success` (#217937, a brighter green than the deep main green) carries positive status; `warning` uses the deep gold (#845A0F) with its icon and word, so it never relies on colour; `info` is neutral grey (#51565C); `destructive` (#B2403D) stays red for errors only, because an error must be unmistakable. Chroma 0.15 or less (house rule). Status is always also said in words or an icon. Charts lead with green (`chart-1` #0E794C light, #64C591 dark, used by every single-series bar and progress bar), then gold (`chart-2` #93640C), deep gold, grey and deep green.
 - **Status surfaces (tinted, subtle):** `success-subtle` (#E1F7E3), `warning-subtle` (#FDF1D8, a pale gold), `destructive-subtle` (#FEEBE9) and `info-subtle` (#ECEFF1, neutral) sit at L about 0.955; in dark mode L 0.27 (#172C1C, #2E2511, #3A1D1B, #252729). Each carries its own semantic colour as text, plus `foreground` and `muted-foreground`. They are fills, never borders, and never a whole region or page.
 - **Lines:** `border` (#E1E3E5) is a decorative hairline between regions and may be below 3:1. `input` (#83868B) is the edge of a field, checkbox or control that has no other boundary, and must stay at 3:1 or more.
 - **Dark mode is designed, not inverted:** surfaces step up in lightness (background #0D0E11, card #16181C, popover #1D1F23, muted #1E2124) so layers read without shadows; the sidebar steps below the canvas (#08090C); edges are opaque (`dark-input` #75797F), never white at 10–15%.
@@ -660,6 +680,20 @@ Measured contrast (WCAG 2.x, sRGB, worst surface each colour sits on):
 | band-foreground / band-muted / gold on band (closing call to action) | 17.4 / 9.9 / 11.6 | 14.5 / 9.1 / 9.9 | 4.5 |
 | brand (label) on gold / gold-hover (gold button) | 11.6 / 9.8 | 11.6 / 9.8 | 4.5 |
 | foreground / muted-foreground / primary-ink on section (How it works band) | 16.6 / 5.9 / 7.3 | 17.6 / 8.2 / 10.3 | 4.5 |
+| foreground on selected / accent | 16.2 / 15.7 | 14.4 / 13.4 | 4.5 |
+| success, warning, destructive, info on muted | 4.8, 5.4, 5.0, 6.6 | 8.2, 9.2, 6.2, 8.1 | 4.5 |
+| success, warning, destructive, info on their own `*-subtle` | 4.81, 5.44, 4.96, 6.43 | 7.54, 8.58, 5.81, 7.53 | 4.5 |
+| foreground / muted-foreground on any `*-subtle` (worst) | 16.0 / 5.6 | 13.2 / 6.2 | 4.5 |
+| sidebar-foreground on sidebar / sidebar-accent | 15.3 / 14.0 | 16.2 / 13.2 | 4.5 |
+| sidebar-muted-foreground on sidebar / sidebar-accent | 5.7 / 5.3 | 7.5 / 6.1 | 4.5 |
+| sidebar-primary (selected marker) on sidebar / sidebar-accent | 5.1 / 4.6 | 10.4 / 8.5 | 4.5 |
+| sidebar-primary-foreground on sidebar-primary | 5.1 | 10.0 | 4.5 |
+| chart-1 … chart-5 on muted (marks) | 4.8, 4.6, 5.4, 5.3, 6.2 | 7.7, 8.0, 6.0, 6.5, 5.3 | 3.0 |
+| input edge on background / card / popover / muted / accent | 3.39 / 3.62 / 3.62 / 3.22 / 3.10 | 4.41 / 4.05 / 3.76 / 3.71 / 3.45 | 3.0 |
+| ring on background / muted / worst `*-subtle` | 7.5 / 7.2 / 7.0 | 8.8 / 7.4 / 6.8 | 3.0 |
+| sidebar-ring on sidebar / sidebar-accent | 7.7 / 7.1 | 9.1 / 7.4 | 3.0 |
+| warning (check-before-use underline) on background | 5.7 | 11.0 | 3.0 |
+| border on background | 1.2 | 1.4 | decorative only |
 | foreground on selected / accent | 16.2 / 15.7 | 14.4 / 13.4 | 4.5 |
 | success, warning, destructive, info on muted | 4.8, 5.4, 5.0, 6.6 | 8.2, 9.2, 6.2, 8.1 | 4.5 |
 | success, warning, destructive, info on their own `*-subtle` | 4.81, 5.44, 4.96, 6.43 | 7.54, 8.58, 5.81, 7.53 | 4.5 |

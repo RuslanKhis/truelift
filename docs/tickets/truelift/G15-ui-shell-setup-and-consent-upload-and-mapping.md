@@ -157,8 +157,8 @@ Estimate: the design passes asked for in review (fourteen, R6) were extra work b
 
 Human effort still owed (about 1–2 h review and verify):
 
-- Run the DESIGN.md lint, which was not run here because fetching it with `npx` was not permitted: `npx -y @google/design.md@0.4.0 lint docs/design/DESIGN.md --format json`. Treat any error or warning in `summary` as a failure. This matters more now that the colours changed: the 4.5:1 text pairs were computed here but not yet checked by the linter.
-- Look at the app once in a browser: `npm --prefix frontend run build`, then `uv run truelift`. Walk AI provider → project → Data (upload `duplicate_keys.csv` and a normal CSV) → What is shared → Column roles, at phone and desktop width, in light and dark.
+- ~~Run the DESIGN.md lint~~ done 2026-11-24 (`@google/design.md` 0.4.0, run from the local npx cache): `summary` errors 0, warnings 0 (one info). The first run had 10 warnings, fixed: `chart-1` and `chart-2` darkened a step to clear 4.5:1 on `muted` (#0E794C, #93640C), and component entries added for the tokens no component referenced (`choice`, `card-edge`, `chip-fill`, `dark-gold-hover`, `dark-brand`).
+- ~~Look at the app once in a browser~~ done by Chloe, 2026-11-24 (light and dark, 375 px, tablet and desktop).
 - Optionally install the three companion skills and check the hand-written components against the `shadcn` skill.
 - Review the diff and commit (nothing is committed).
 
