@@ -1,0 +1,422 @@
+/*
+ * truelift theme (docs/design/DESIGN.md, adapted from the house design system) mapped onto the
+ * shadcn variables. Token values are copied exactly from DESIGN.md; keep the two in step.
+ * No shadcn default tokens or fonts remain (frontend/scripts/check_theme.py).
+ * Fonts are self-hosted from @fontsource-variable; the CSP allows no font CDN.
+ */
+@import "tailwindcss";
+@import "@fontsource-variable/manrope";
+@import "@fontsource-variable/schibsted-grotesk";
+@import "@fontsource-variable/jetbrains-mono";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --radius: 0.375rem;
+  --background: oklch(0.975 0.002 250);
+  --foreground: oklch(0.19 0.012 260);
+  --card: oklch(0.998 0.0005 250);
+  --card-foreground: oklch(0.19 0.012 260);
+  --popover: oklch(0.998 0.0005 250);
+  --popover-foreground: oklch(0.19 0.012 260);
+  --primary: oklch(0.42 0.09 160);
+  --primary-hover: oklch(0.37 0.08 160);
+  --primary-active: oklch(0.32 0.07 160);
+  --primary-foreground: oklch(0.99 0.002 250);
+  --secondary: oklch(0.955 0.003 250);
+  --secondary-foreground: oklch(0.24 0.012 260);
+  --muted: oklch(0.958 0.003 250);
+  --muted-foreground: oklch(0.48 0.012 258);
+  --accent: oklch(0.945 0.004 250);
+  --accent-foreground: oklch(0.19 0.012 260);
+  --band-muted: oklch(0.8 0.01 258);
+  --band-foreground: oklch(0.98 0.003 250);
+  --band: oklch(0.19 0.006 260);
+  --section: oklch(0.963 0.003 250);
+  --gold-hover: oklch(0.8 0.135 85);
+  --choice: oklch(0.965 0.022 150);
+  --card-edge: oklch(0.8 0.035 160);
+  --chip-fill: oklch(0.85 0.13 85);
+  --brand: oklch(0.19 0.006 260);
+  --gold: oklch(0.85 0.13 85);
+  --chip-foreground: oklch(0.42 0.09 160);
+  --chip: oklch(0.94 0.06 88);
+  --primary-ink: oklch(0.42 0.09 160);
+  --selected: oklch(0.955 0.003 250);
+  --destructive: oklch(0.53 0.15 25);
+  --destructive-foreground: oklch(0.99 0.002 250);
+  --success: oklch(0.51 0.13 148);
+  --warning: oklch(0.5 0.1 75);
+  --info: oklch(0.45 0.012 258);
+  --success-subtle: oklch(0.955 0.035 148);
+  --warning-subtle: oklch(0.96 0.035 85);
+  --destructive-subtle: oklch(0.955 0.02 25);
+  --info-subtle: oklch(0.95 0.004 250);
+  --border: oklch(0.915 0.003 250);
+  --input: oklch(0.62 0.008 258);
+  --ring: oklch(0.42 0.09 160);
+  --chart-1: oklch(0.55 0.12 158);
+  --chart-2: oklch(0.6 0.12 75);
+  --chart-3: oklch(0.5 0.1 75);
+  --chart-4: oklch(0.5 0.015 258);
+  --chart-5: oklch(0.45 0.11 155);
+  --sidebar: oklch(0.985 0.002 250);
+  --sidebar-foreground: oklch(0.25 0.012 260);
+  --sidebar-muted-foreground: oklch(0.5 0.012 258);
+  --sidebar-primary: oklch(0.515 0.125 155);
+  --sidebar-primary-foreground: oklch(0.99 0.002 250);
+  --sidebar-accent: oklch(0.955 0.003 250);
+  --sidebar-accent-foreground: oklch(0.19 0.012 260);
+  --sidebar-border: oklch(0.915 0.003 250);
+  --sidebar-ring: oklch(0.42 0.09 160);
+  /* One resting elevation for cards, light mode only (DESIGN.md, Elevation & Depth). */
+  --card-shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px -12px rgb(15 23 42 / 0.12);
+  --card-shadow-hover: 0 2px 4px rgb(15 23 42 / 0.05), 0 16px 32px -12px rgb(15 23 42 / 0.18);
+  /* Dark text on a green fill reads thinner than light text on dark, so the dark-mode label is heavier. */
+  --primary-label-weight: 600;
+  --scrim: oklch(0.21 0.02 262 / 0.4);
+}
+
+.dark {
+  --background: oklch(0.165 0.006 260);
+  --foreground: oklch(0.96 0.003 250);
+  --card: oklch(0.21 0.007 260);
+  --card-foreground: oklch(0.96 0.003 250);
+  --popover: oklch(0.24 0.008 260);
+  --popover-foreground: oklch(0.96 0.003 250);
+  --primary: oklch(0.7 0.11 160);
+  --primary-hover: oklch(0.75 0.1 160);
+  --primary-active: oklch(0.65 0.1 160);
+  --primary-foreground: oklch(0.17 0.02 160);
+  --secondary: oklch(0.265 0.008 260);
+  --secondary-foreground: oklch(0.93 0.003 250);
+  --muted: oklch(0.245 0.007 260);
+  --muted-foreground: oklch(0.73 0.01 258);
+  --accent: oklch(0.27 0.006 260);
+  --accent-foreground: oklch(0.96 0.003 250);
+  --band-muted: oklch(0.82 0.02 160);
+  --band-foreground: oklch(0.97 0.005 250);
+  --band: oklch(0.25 0.035 160);
+  --section: oklch(0.148 0.006 260);
+  --gold-hover: oklch(0.8 0.135 85);
+  --choice: oklch(0.27 0.03 158);
+  --card-edge: oklch(0.4 0.02 160);
+  --chip-fill: oklch(0.58 0.105 80);
+  --brand: oklch(0.19 0.006 260);
+  --gold: oklch(0.85 0.13 85);
+  --chip-foreground: oklch(0.93 0.05 88);
+  --chip: oklch(0.32 0.045 80);
+  --primary-ink: oklch(0.78 0.11 160);
+  --selected: oklch(0.245 0.006 260);
+  --destructive: oklch(0.72 0.14 25);
+  --destructive-foreground: oklch(0.18 0.03 25);
+  --success: oklch(0.77 0.13 150);
+  --warning: oklch(0.82 0.13 85);
+  --info: oklch(0.78 0.01 258);
+  --success-subtle: oklch(0.27 0.04 150);
+  --warning-subtle: oklch(0.27 0.035 85);
+  --destructive-subtle: oklch(0.27 0.045 25);
+  --info-subtle: oklch(0.27 0.006 260);
+  --border: oklch(0.29 0.006 260);
+  --input: oklch(0.575 0.01 258);
+  --ring: oklch(0.74 0.11 160);
+  --chart-1: oklch(0.75 0.12 158);
+  --chart-2: oklch(0.78 0.13 85);
+  --chart-3: oklch(0.7 0.12 80);
+  --chart-4: oklch(0.72 0.012 258);
+  --chart-5: oklch(0.65 0.12 155);
+  --sidebar: oklch(0.14 0.006 260);
+  --sidebar-foreground: oklch(0.93 0.003 250);
+  --sidebar-muted-foreground: oklch(0.7 0.01 258);
+  --sidebar-primary: oklch(0.78 0.11 160);
+  --sidebar-primary-foreground: oklch(0.17 0.02 160);
+  --sidebar-accent: oklch(0.245 0.006 260);
+  --sidebar-accent-foreground: oklch(0.96 0.003 250);
+  --sidebar-border: oklch(0.25 0.006 260);
+  --sidebar-ring: oklch(0.74 0.11 160);
+  --shadow-md: 0 0 #0000;
+  --shadow-lg: 0 0 #0000;
+  /* Dark mode separates layers by surface step and hairline, not shadow. */
+  --card-shadow: 0 0 #0000;
+  --card-shadow-hover: 0 0 #0000;
+  --primary-label-weight: 700;
+}
+
+/* Plain @theme so a brand can override fonts and radius steps at run time (DESIGN.md). */
+@theme {
+  --font-sans: "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Schibsted Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-heading: var(--font-sans);
+  --radius-sm: 6px;
+  --radius-md: 6px;
+  --radius-lg: 8px; /* buttons, inputs, selects */
+  --radius-xl: 12px; /* cards */
+  --radius-2xl: 16px; /* hero visual, feature cards */
+  --radius-3xl: 16px;
+  --radius-4xl: 16px;
+  --shadow-xs: 0 0 #0000;
+  --shadow-sm: 0 0 #0000;
+  --shadow-float: 0 1px 2px rgb(15 23 42 / 0.06), 0 8px 24px rgb(15 23 42 / 0.08);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-band-muted: var(--band-muted);
+  --color-band-foreground: var(--band-foreground);
+  --color-band: var(--band);
+  --color-section: var(--section);
+  --color-gold-hover: var(--gold-hover);
+  --color-choice: var(--choice);
+  --color-card-edge: var(--card-edge);
+  --color-chip-fill: var(--chip-fill);
+  --color-brand: var(--brand);
+  --color-gold: var(--gold);
+  --color-chip-foreground: var(--chip-foreground);
+  --color-chip: var(--chip);
+  --color-primary-ink: var(--primary-ink);
+  --color-selected: var(--selected);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-success-subtle: var(--success-subtle);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-destructive-subtle: var(--destructive-subtle);
+  --color-info-subtle: var(--info-subtle);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-muted-foreground: var(--sidebar-muted-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-scrim: var(--scrim);
+}
+
+/* Type tokens as utilities, not --text-* keys (cn() would read those as colours).
+ * Fluid display sizes grow with the viewport; text sizes step up once at 768 px. */
+@utility type-hero {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+@utility type-display {
+  font-family: var(--font-display);
+  font-size: clamp(1.875rem, 3vw, 2.5rem);
+  font-weight: 650;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+@utility type-headline-lg {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+@utility type-headline-md {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 1.8vw, 1.5rem);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+@utility type-metric {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 2.5vw, 2.25rem);
+  font-weight: 650;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+@utility type-lead {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 450;
+  line-height: 26px;
+  @media (width >= 48rem) {
+    font-size: 18px;
+    line-height: 28px;
+  }
+}
+@utility type-title-md {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  @media (width >= 48rem) {
+    font-size: 17px;
+  }
+}
+@utility type-body-md {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 450;
+  line-height: 22px;
+  @media (width >= 48rem) {
+    font-size: 15px;
+    line-height: 24px;
+  }
+}
+@utility type-body-sm {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 450;
+  line-height: 20px;
+  @media (width >= 48rem) {
+    font-size: 14px;
+  }
+}
+@utility type-label-md {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  @media (width >= 48rem) {
+    font-size: 15px;
+  }
+}
+/* type-label-md for labels on a primary fill (buttons, the active step): weight from the theme scope. */
+@utility type-label-primary {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: var(--primary-label-weight);
+  line-height: 20px;
+  @media (width >= 48rem) {
+    font-size: 15px;
+  }
+}
+@utility type-caption {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  @media (width >= 48rem) {
+    font-size: 13px;
+    line-height: 18px;
+  }
+}
+@utility type-data-md {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 450;
+  line-height: 22px;
+  font-variant-numeric: tabular-nums;
+  @media (width >= 48rem) {
+    font-size: 15px;
+    line-height: 24px;
+  }
+}
+@utility type-code-sm {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 20px;
+}
+@utility shadow-card {
+  box-shadow: var(--card-shadow);
+}
+@utility shadow-card-hover {
+  box-shadow: var(--card-shadow-hover);
+}
+/* The one allowed pattern (DESIGN.md, Elevation & Depth): a faint 40 px grid behind the landing
+ * hero, in the hairline colour, fading out towards the edges. Hard-stop lines, not a colour gradient. */
+@utility bg-grid {
+  --grid-line: color-mix(in oklab, var(--border) 50%, transparent);
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 40px 40px;
+  /* Full strength to mid-headline (fixed, so it lands on the headline at every width), then a slow
+   * fade over the rest of the hero: still visible at the halfway point, faint near the end, and
+   * fully blended into the canvas at the section's bottom edge. */
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 160px,
+    rgb(0 0 0 / 0.5) 50%,
+    rgb(0 0 0 / 0.3) 70%,
+    rgb(0 0 0 / 0.15) 88%,
+    transparent 100%
+  );
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-background text-foreground type-body-md antialiased;
+  }
+  /* Tailwind's preflight leaves buttons at the default cursor; every enabled control shows a pointer. */
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  select:not(:disabled),
+  input[type='radio']:not(:disabled),
+  input[type='checkbox']:not(:disabled),
+  input[type='file']:not(:disabled),
+  input[type='file']:not(:disabled)::file-selector-button,
+  label[for],
+  summary {
+    cursor: pointer;
+  }
+}
+
+/* Focus: a 2 px solid ring outline with a 2 px offset (survives forced colours); no ring shadow. */
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  --tw-ring-shadow: 0 0 #0000;
+}
+/* The sidebar is dark in both modes; its focus outline uses the light sidebar ring (3:1 on it). */
+.sidebar-scope :focus-visible {
+  outline-color: var(--sidebar-ring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
