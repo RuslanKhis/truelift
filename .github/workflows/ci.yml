@@ -66,3 +66,20 @@ jobs:
         run: make check
       - name: make dist
         run: make dist
+
+  # The causal core on a second OS (G06/A3): the compiled config must be byte-identical to the
+  # committed reference on Linux (make check above) and on macOS. lightgbm and xgboost need
+  # OpenMP; the A6 test points the child process at scikit-learn's bundled libomp.
+  causal-macos:
+    name: causal core and golden cases on macOS
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: ${{ env.UV_VERSION }}
+      - name: Causal core and golden cases
+        run: uv run --locked pytest tests/causal tests/golden

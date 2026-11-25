@@ -1,0 +1,108 @@
+{
+  "compiler_version": "1",
+  "controls": [
+    "holiday",
+    "media_grps"
+  ],
+  "data_fingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "dummies": [
+    {
+      "column": "region",
+      "levels": [
+        "R01",
+        "R02",
+        "R03",
+        "R04",
+        "R05",
+        "R06",
+        "R07",
+        "R08"
+      ],
+      "names": [
+        "region_R01",
+        "region_R02",
+        "region_R03",
+        "region_R04",
+        "region_R05",
+        "region_R06",
+        "region_R07",
+        "region_R08"
+      ]
+    }
+  ],
+  "opt_threshold_roi_assumed": false,
+  "orchestrator": {
+    "cate_structure_list": [
+      {
+        "degree": 2,
+        "df": 3,
+        "include_intercept": false,
+        "type": "auto_additive"
+      }
+    ],
+    "covariates_for_cate_list": [
+      []
+    ],
+    "d_cols": [
+      "discount_rate"
+    ],
+    "date_col": "week",
+    "geo_col": "region",
+    "item_col": null,
+    "ml_models_t": [
+      "lgbm",
+      "xgboost"
+    ],
+    "ml_models_y": [
+      "lgbm",
+      "xgboost"
+    ],
+    "n_folds_list": [
+      3,
+      5
+    ],
+    "opt_threshold_roi": 2.5,
+    "optimize": true,
+    "run_sensitivity": true,
+    "sales_col": "revenue",
+    "sensitivity_scope": [
+      "total",
+      "geo"
+    ],
+    "time_budget": 30,
+    "treatment_spend_cols": {
+      "discount_rate": "discount_spend"
+    },
+    "treatment_types": {
+      "discount_rate": "percentage"
+    },
+    "x_cols_list": [
+      [
+        "holiday",
+        "media_grps",
+        "region_R01",
+        "region_R02",
+        "region_R03",
+        "region_R04",
+        "region_R05",
+        "region_R06",
+        "region_R07",
+        "region_R08"
+      ]
+    ],
+    "y_col": "revenue"
+  },
+  "profile": "standard",
+  "run": {
+    "n_reps": 10,
+    "top_n": 3
+  },
+  "scaler": {
+    "median_normalize_cols": [
+      "media_grps"
+    ],
+    "population_col": "population",
+    "population_median_normalize_cols": []
+  },
+  "schema": "truelift.pipeline_config/1"
+}

@@ -402,12 +402,17 @@ def read_yaml(path: Path) -> Any:
         text = path.read_text(encoding="utf-8")
     except FileNotFoundError as exc:
         raise RulesError(f"{path.name}: file not found") from exc
+    return parse_yaml(text, path.name)
+
+
+def parse_yaml(text: str, source: str) -> Any:
+    """Parse YAML text safely, refusing duplicate keys. Errors name ``source`` and the line."""
     try:
         return yaml.load(text, Loader=_UniqueKeyLoader)  # noqa: S506 - a SafeLoader subclass
     except yaml.YAMLError as exc:
         mark = getattr(exc, "problem_mark", None)
         where = f" line {mark.line + 1}" if mark is not None else ""
-        raise RulesError(f"{path.name}{where}: not valid YAML ({getattr(exc, 'problem', exc)})") from exc
+        raise RulesError(f"{source}{where}: not valid YAML ({getattr(exc, 'problem', exc)})") from exc
 
 
 def _parse[M: BaseModel](model: type[M], path: Path, data: Any) -> M:
