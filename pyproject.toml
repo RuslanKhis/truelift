@@ -71,7 +71,8 @@ markers = [
 line-length = 110
 target-version = "py312"
 # Pre-existing maintenance script, outside G01; lint it in its own change.
-extend-exclude = ["scripts/tickets_to_github.py"]
+# check_theme.py is vendored verbatim from adk-frontend-integration (MIT, G15); diff it against upstream.
+extend-exclude = ["scripts/tickets_to_github.py", "frontend/scripts/check_theme.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP"]

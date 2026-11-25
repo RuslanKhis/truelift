@@ -34,6 +34,8 @@ build/
 # --- Node / React ----------------------------------------------------------
 node_modules/
 frontend/dist/
+# The SPA build (G15, `npm --prefix frontend run build`); served by src/truelift/api/spa.py, never committed.
+src/truelift/web/
 .vite/
 
 # --- OS / editors ----------------------------------------------------------
