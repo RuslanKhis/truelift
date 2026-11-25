@@ -55,7 +55,11 @@ client-check: $(FRONTEND)/node_modules
 # ADK pin is a release-unit decision. Not reachable in G02: nothing extracts W3C trace context
 # from incoming requests (no OTel instrumentation, ADK's server not mounted, loopback + token).
 # Remove when google-adk moves to a release that allows opentelemetry-api >= 1.45.1 (2.14.0+).
-PIP_AUDIT_IGNORE := --ignore-vuln CVE-2026-114603
+# CVE-2026-126360 (GHSA-mf5v-w3w3-f6cg): quadratic-time traceparent parsing in
+# TraceContextTextMapPropagator.extract(). Needs a carrier that keeps embedded newlines (JSON, MCP
+# metadata), not an HTTP header. Not reachable: no propagator, no MCP. Same fix path: google-adk
+# 2.14+ allows opentelemetry-api 1.45.2, which fixes both. G02 ruling R7.
+PIP_AUDIT_IGNORE := --ignore-vuln CVE-2026-114603 --ignore-vuln CVE-2026-126360
 
 ## audit: known-vulnerability scan of every locked package (SB15).
 ## pip-audit fails on any known vulnerability, which covers "high"; npm audit fails on high
