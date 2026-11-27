@@ -1,0 +1,1 @@
+{"id": "msg_rec_safety", "model": "claude-sonnet-5-5", "object": "chat.completion", "choices": [{"index": 0, "finish_reason": "content_filter", "message": {"role": "assistant", "content": ""}}], "usage": {"prompt_tokens": 700, "completion_tokens": 0, "total_tokens": 700}}

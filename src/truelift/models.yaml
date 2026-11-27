@@ -1,0 +1,45 @@
+# Pinned model IDs and gateway limits (D7, C7, C8, C15). Read by truelift.agents.gateway.
+# Changing a model ID is a release-unit change (design §9): re-run the recorded-reply suite
+# (tests/agents/test_gateway.py) and the live check owed in the G11 ticket.
+
+providers:
+  gemini:
+    label: Google Gemini
+    # Native ADK model (google.adk.models.google_llm.Gemini). Stable since 2026-09-02 (D7).
+    model_id: gemini-3.8-flash
+    adk: native
+    # OS keychain entry: service "truelift", this account. Never a file (C7).
+    keyring_account: gemini
+    # Read only when the keychain is unavailable or locked (C7, G11/A7).
+    env_var: TRUELIFT_GEMINI_API_KEY
+    # The only network destination for this provider (C8, G11/A9).
+    host: generativelanguage.googleapis.com
+  claude:
+    label: Anthropic Claude
+    # Through ADK LiteLlm (google.adk.models.lite_llm.LiteLlm), "<provider>/<model>".
+    model_id: claude-sonnet-5-5
+    adk: litellm
+    litellm_model: anthropic/claude-sonnet-5-5
+    keyring_account: anthropic
+    env_var: TRUELIFT_ANTHROPIC_API_KEY
+    host: api.anthropic.com
+
+# Provider order on the setup screen; the first with a key is active unless the user chose one.
+order: [gemini, claude]
+
+limits:
+  # RunConfig.max_llm_calls for one agent invocation (one user message). Positive (C15).
+  max_llm_calls: 12
+  # Default project token budget; the user can change it (C15).
+  default_token_budget: 2000000
+  # Reply cap set on a request that has none, and the output part of a lost call's estimate.
+  max_output_tokens: 4096
+  # Largest request the gateway lets leave the machine, in bytes of serialised content (C8).
+  max_request_bytes: 262144
+  # Retries after a 429 or an unavailable provider, then the AI pauses (C15, SB19).
+  max_retries: 2
+  retry_delays_s: [2.0, 6.0]
+  # Total wait for one model call, retries included, before "AI unavailable" (C15, G11/A6).
+  call_deadline_s: 60.0
+  # Bytes per token for the conservative input estimate charged before a reply arrives (A11).
+  bytes_per_token_estimate: 3

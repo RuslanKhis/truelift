@@ -4522,6 +4522,16 @@
               }
             },
             "description": "Something went wrong. Quote the request ID if you report it."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Temporarily unavailable. Try again shortly."
           }
         },
         "summary": "Put Api Key",

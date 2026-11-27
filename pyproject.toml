@@ -19,6 +19,7 @@ dependencies = [
     "fastapi>=0.138",
     "google-adk>=2.12,<2.13",
     "jsonschema>=4.26",
+    "keyring>=25.7",
     "lightgbm>=4.7.0",
     "litellm>=1.84,<1.106.3",
     "networkx>=3.3",

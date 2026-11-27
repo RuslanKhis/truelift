@@ -5,6 +5,9 @@ token in the URL), body limit. The ``/api`` router requires the launch token on 
 including its catch-all 404. ADK's own server (``get_fast_api_app``) is never mounted; the ADK
 Runner arrives in process with G13. No CORS middleware is installed.
 
+The model gateway (G11) holds keys, consent, budget and the egress ledger; log records are
+scrubbed of keys from app creation on.
+
 At startup the run manager reconciles the runs table (runs left queued or running with no live
 worker become ``interrupted``); at shutdown it stops active workers (G09, D8).
 """
@@ -22,6 +25,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from starlette.middleware import Middleware
 
 from truelift import __version__
+from truelift.agents import redaction
+from truelift.agents.gateway import Gateway
 from truelift.api.auth import LocalhostGuardMiddleware, require_launch_token
 from truelift.api.errors import ERROR_RESPONSES, ApiError, RequestIdMiddleware, install_error_handlers
 from truelift.api.fakes import DEMO_PROJECT, FakeStore
@@ -101,6 +106,10 @@ def create_app(settings: Settings) -> FastAPI:
         reserved_ids=frozenset({DEMO_PROJECT}),
     )
     app.state.runs = RunManager(app.state.store)
+    # Every LLM call goes through the gateway (G11, D7). No key is read until a call or a status
+    # check needs one; every log record of the process is scrubbed of keys (C7, SB14).
+    redaction.install()
+    app.state.gateway = Gateway(app.state.store.db)
     app.state.agent_busy = set()
     install_error_handlers(app)
 

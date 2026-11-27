@@ -1,0 +1,1 @@
+{"id": "msg_rec_text", "model": "claude-sonnet-5-5", "object": "chat.completion", "choices": [{"index": 0, "finish_reason": "stop", "message": {"role": "assistant", "content": "Thanks. Holiday weeks seem to drive both discounts and sales."}}], "usage": {"prompt_tokens": 812, "completion_tokens": 14, "total_tokens": 826}}
