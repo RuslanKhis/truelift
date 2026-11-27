@@ -24,3 +24,35 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
     for item in items:
         if "private" in item.keywords:
             item.add_marker(skip_private)
+
+
+class MemoryKeyring:
+    """An in-memory keyring backend: no test reads or writes the developer's real keychain (G11)."""
+
+    priority = 1
+
+    def __init__(self) -> None:
+        self.items: dict[tuple[str, str], str] = {}
+
+    def get_password(self, service: str, username: str) -> str | None:
+        return self.items.get((service, username))
+
+    def set_password(self, service: str, username: str, password: str) -> None:
+        self.items[(service, username)] = password
+
+    def delete_password(self, service: str, username: str) -> None:
+        import keyring.errors
+
+        if self.items.pop((service, username), None) is None:
+            raise keyring.errors.PasswordDeleteError(username)
+
+
+@pytest.fixture(autouse=True)
+def memory_keyring(monkeypatch: pytest.MonkeyPatch) -> MemoryKeyring:
+    import keyring
+
+    backend = MemoryKeyring()
+    monkeypatch.setattr(keyring, "get_keyring", lambda: backend)
+    for var in ("TRUELIFT_GEMINI_API_KEY", "TRUELIFT_ANTHROPIC_API_KEY"):
+        monkeypatch.delenv(var, raising=False)
+    return backend

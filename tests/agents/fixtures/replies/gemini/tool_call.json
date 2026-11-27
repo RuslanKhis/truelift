@@ -1,0 +1,1 @@
+{"candidates": [{"content": {"role": "model", "parts": [{"functionCall": {"name": "record_note", "args": {"note": "holiday weeks"}}}]}, "finishReason": "STOP", "index": 0}], "usageMetadata": {"promptTokenCount": 640, "candidatesTokenCount": 9, "totalTokenCount": 649}, "modelVersion": "gemini-3.8-flash"}

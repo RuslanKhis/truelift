@@ -32,7 +32,9 @@ from sqlalchemy import (
     String,
     Table,
     create_engine,
+    delete,
     event,
+    func,
     insert,
     select,
     update,
@@ -92,6 +94,78 @@ runs = Table(
 )
 
 ACTIVE_RUN_STATUSES = ("queued", "running")
+
+
+# --- Model gateway (G11; C7, C8, C15, D17) --------------------------------------------------
+# No table holds a key, a prompt or a reply: consent, the budget and per-call sizes only.
+
+# One row per project and provider: the disclosure version the user accepted (C8).
+consents = Table(
+    "consents",
+    metadata,
+    Column("project_id", String(63), primary_key=True),
+    Column("provider", String(16), primary_key=True),
+    Column("disclosure_version", String(32), nullable=False),
+    Column("accepted_at", UtcDateTime(), nullable=False),
+)
+
+# The token budget the user set for a project (C15). No row means the default budget.
+ai_budgets = Table(
+    "ai_budgets",
+    metadata,
+    Column("project_id", String(63), primary_key=True),
+    Column("token_budget", Integer, nullable=False),
+)
+
+# The egress ledger (C8, D17): one row per provider attempt, written before the request leaves,
+# with categories, sizes and tokens, never content. ``status``: ``sent`` (reserved, in flight),
+# ``settled`` (provider usage), ``estimated`` (reply without usage), ``lost`` (no reply; the
+# estimate stays charged, C15), ``rejected`` (refused by the provider, not billed),
+# ``not_sent`` (the connection never opened).
+ledger = Table(
+    "egress_ledger",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("project_id", String(63), nullable=False, index=True),
+    Column("at", UtcDateTime(), nullable=False),
+    Column("provider", String(16), nullable=False),
+    Column("model_id", String(80), nullable=False),
+    Column("categories", String(200), nullable=False),
+    Column("bytes_sent", Integer, nullable=False),
+    Column("input_tokens", Integer, nullable=False),
+    Column("output_tokens", Integer, nullable=False),
+    Column("status", String(16), nullable=False),
+)
+
+# Small app-wide settings, for example the active provider. Never a secret.
+app_settings = Table(
+    "app_settings",
+    metadata,
+    Column("key", String(40), primary_key=True),
+    Column("value", String(200), nullable=False),
+)
+
+
+@dataclass(frozen=True)
+class ConsentRow:
+    project_id: str
+    provider: str
+    disclosure_version: str
+    accepted_at: datetime
+
+
+@dataclass(frozen=True)
+class LedgerRow:
+    id: int
+    project_id: str
+    at: datetime
+    provider: str
+    model_id: str
+    categories: str
+    bytes_sent: int
+    input_tokens: int
+    output_tokens: int
+    status: str
 
 
 @dataclass(frozen=True)
@@ -236,6 +310,84 @@ class StateDb:
             if only_if_active:
                 stmt = stmt.where(runs.c.status.in_(ACTIVE_RUN_STATUSES))
             return conn.execute(stmt.values(**values)).rowcount == 1
+
+    # --- model gateway (G11) ----------------------------------------------------------------
+
+    def consent(self, project_id: str, provider: str) -> ConsentRow | None:
+        with self.transaction() as conn:
+            row = conn.execute(
+                select(consents).where(consents.c.project_id == project_id, consents.c.provider == provider)
+            ).first()
+        return ConsentRow(**row._asdict()) if row else None
+
+    def set_consent(self, row: ConsentRow) -> None:
+        with self.transaction() as conn:
+            conn.execute(
+                delete(consents).where(
+                    consents.c.project_id == row.project_id, consents.c.provider == row.provider
+                )
+            )
+            conn.execute(insert(consents).values(**row.__dict__))
+
+    def token_budget(self, project_id: str) -> int | None:
+        with self.transaction() as conn:
+            return conn.execute(
+                select(ai_budgets.c.token_budget).where(ai_budgets.c.project_id == project_id)
+            ).scalar()
+
+    def set_token_budget(self, project_id: str, token_budget: int) -> None:
+        with self.transaction() as conn:
+            conn.execute(delete(ai_budgets).where(ai_budgets.c.project_id == project_id))
+            conn.execute(insert(ai_budgets).values(project_id=project_id, token_budget=token_budget))
+
+    @staticmethod
+    def _tokens_used(conn: Connection, project_id: str) -> int:
+        total = conn.execute(
+            select(func.coalesce(func.sum(ledger.c.input_tokens + ledger.c.output_tokens), 0)).where(
+                ledger.c.project_id == project_id
+            )
+        ).scalar()
+        return int(total or 0)
+
+    def tokens_used(self, project_id: str) -> int:
+        with self.transaction() as conn:
+            return self._tokens_used(conn, project_id)
+
+    def reserve_call(self, row: LedgerRow, token_budget: int) -> int | None:
+        """Write the ledger row of an attempt and charge its estimate, unless the estimate would
+        take the project past ``token_budget``; return the row ID, or None when refused.
+
+        ``BEGIN IMMEDIATE`` makes the check and the insert one step, so two writers cannot both
+        pass the same remaining budget (C15)."""
+        with self.transaction() as conn:
+            used = self._tokens_used(conn, row.project_id)
+            if used >= token_budget or used + row.input_tokens + row.output_tokens > token_budget:
+                return None
+            values = {k: v for k, v in row.__dict__.items() if k != "id"}
+            return int(conn.execute(insert(ledger).values(**values)).inserted_primary_key[0])
+
+    def settle_call(self, ledger_id: int, **values: object) -> None:
+        with self.transaction() as conn:
+            conn.execute(update(ledger).where(ledger.c.id == ledger_id).values(**values))
+
+    def ledger_rows(self, project_id: str, limit: int = 500) -> list[LedgerRow]:
+        with self.transaction() as conn:
+            rows = conn.execute(
+                select(ledger)
+                .where(ledger.c.project_id == project_id)
+                .order_by(ledger.c.id.desc())
+                .limit(limit)
+            ).all()
+        return [LedgerRow(**r._asdict()) for r in rows]
+
+    def setting(self, key: str) -> str | None:
+        with self.transaction() as conn:
+            return conn.execute(select(app_settings.c.value).where(app_settings.c.key == key)).scalar()
+
+    def set_setting(self, key: str, value: str) -> None:
+        with self.transaction() as conn:
+            conn.execute(delete(app_settings).where(app_settings.c.key == key))
+            conn.execute(insert(app_settings).values(key=key, value=value))
 
     def dispose(self) -> None:
         with self._lock:

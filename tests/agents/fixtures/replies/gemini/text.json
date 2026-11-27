@@ -1,0 +1,1 @@
+{"candidates": [{"content": {"role": "model", "parts": [{"text": "Thanks. Holiday weeks seem to drive both discounts and sales."}]}, "finishReason": "STOP", "index": 0}], "usageMetadata": {"promptTokenCount": 812, "candidatesTokenCount": 14, "totalTokenCount": 826}, "modelVersion": "gemini-3.8-flash"}

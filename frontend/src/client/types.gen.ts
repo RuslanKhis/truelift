@@ -2555,6 +2555,10 @@ export type SetupPutApiKeyErrors = {
      * Something went wrong. Quote the request ID if you report it.
      */
     500: ErrorBody;
+    /**
+     * Temporarily unavailable. Try again shortly.
+     */
+    503: ErrorBody;
 };
 
 export type SetupPutApiKeyError = SetupPutApiKeyErrors[keyof SetupPutApiKeyErrors];
