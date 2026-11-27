@@ -5,8 +5,8 @@ two writers (two threads, or two processes) queue on SQLite's write lock instead
 half-way or losing an update; a writer that waits longer than the busy timeout gets
 ``OperationalError("database is locked")``, which the API turns into its generic 500 (A9, SB13).
 
-G08 owns the ``projects`` index. Later goals add their own tables (runs: G09; consent, usage
-and the ledger: G11) to the same metadata. The engine is created on first use, so building the
+G08 owns the ``projects`` index and G09 the ``runs`` table. Later goals add their own tables
+(consent, usage and the ledger: G11) to the same metadata. The engine is created on first use, so building the
 app (for example to dump the OpenAPI document) never creates a database.
 """
 
@@ -22,10 +22,12 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from sqlalchemy import (
+    Boolean,
     Column,
     Connection,
     DateTime,
     Engine,
+    Integer,
     MetaData,
     String,
     Table,
@@ -66,6 +68,47 @@ projects = Table(
     Column("created_at", UtcDateTime(), nullable=False),
     Column("updated_at", UtcDateTime(), nullable=False),
 )
+
+
+# One row per pipeline run (G09; C10, D8). ``status`` is the run's authority: results are served
+# only for ``succeeded`` (with a manifest). ``pid`` is the worker, which leads its own process
+# group; ``owner_pid`` is the truelift process that spawned and watches it.
+runs = Table(
+    "runs",
+    metadata,
+    Column("id", String(40), primary_key=True),
+    Column("project_id", String(63), nullable=False, index=True),
+    Column("dag_version", Integer, nullable=False),
+    Column("profile", String(16), nullable=False),
+    Column("status", String(16), nullable=False, index=True),
+    Column("reason", String(600)),
+    Column("pid", Integer),
+    Column("owner_pid", Integer),
+    Column("cancel_requested", Boolean, nullable=False, default=False),
+    Column("config_sha256", String(64), nullable=False),
+    Column("created_at", UtcDateTime(), nullable=False),
+    Column("started_at", UtcDateTime()),
+    Column("finished_at", UtcDateTime()),
+)
+
+ACTIVE_RUN_STATUSES = ("queued", "running")
+
+
+@dataclass(frozen=True)
+class RunRow:
+    id: str
+    project_id: str
+    dag_version: int
+    profile: str
+    status: str
+    reason: str | None
+    pid: int | None
+    owner_pid: int | None
+    cancel_requested: bool
+    config_sha256: str
+    created_at: datetime
+    started_at: datetime | None
+    finished_at: datetime | None
 
 
 @dataclass(frozen=True)
@@ -153,6 +196,46 @@ class StateDb:
     def touch(self, project_id: str, at: datetime) -> None:
         with self.transaction() as conn:
             conn.execute(update(projects).where(projects.c.id == project_id).values(updated_at=at))
+
+    # --- runs (G09) ---------------------------------------------------------------------------
+
+    def insert_run_if_idle(self, row: RunRow) -> RunRow | None:
+        """Insert ``row`` unless a run is queued or running on this machine; return that run then.
+
+        ``BEGIN IMMEDIATE`` takes SQLite's write lock before the check, so two processes (the app
+        and ``truelift run``) cannot both pass it (C10, SB19: one run at a time per machine)."""
+        with self.transaction() as conn:
+            active = conn.execute(select(runs).where(runs.c.status.in_(ACTIVE_RUN_STATUSES)).limit(1)).first()
+            if active is not None:
+                return RunRow(**active._asdict())
+            conn.execute(insert(runs).values(**row.__dict__))
+        return None
+
+    def run(self, run_id: str) -> RunRow | None:
+        with self.transaction() as conn:
+            row = conn.execute(select(runs).where(runs.c.id == run_id)).first()
+        return RunRow(**row._asdict()) if row else None
+
+    def runs_for(self, project_id: str) -> list[RunRow]:
+        with self.transaction() as conn:
+            rows = conn.execute(
+                select(runs).where(runs.c.project_id == project_id).order_by(runs.c.created_at.desc())
+            ).all()
+        return [RunRow(**r._asdict()) for r in rows]
+
+    def active_runs(self) -> list[RunRow]:
+        with self.transaction() as conn:
+            rows = conn.execute(select(runs).where(runs.c.status.in_(ACTIVE_RUN_STATUSES))).all()
+        return [RunRow(**r._asdict()) for r in rows]
+
+    def update_run(self, run_id: str, *, only_if_active: bool = False, **values: object) -> bool:
+        """Update one run. With ``only_if_active`` a run that already ended is left as it is, so
+        a late writer never turns a finished run back (returns False then)."""
+        with self.transaction() as conn:
+            stmt = update(runs).where(runs.c.id == run_id)
+            if only_if_active:
+                stmt = stmt.where(runs.c.status.in_(ACTIVE_RUN_STATUSES))
+            return conn.execute(stmt.values(**values)).rowcount == 1
 
     def dispose(self) -> None:
         with self._lock:
