@@ -29,7 +29,7 @@ from truelift.store.errors import Conflict, NotFound, StoreError
 from truelift.store.folder import PROJECT_FILE, ProjectFolder
 from truelift.store.knowledge import Fact, FactStatus, Knowledge, Source
 from truelift.store.proposals import FactProposal, ProposalStatus, ProposalView
-from truelift.store.versions import Confirmation, VersionKind, Versions, VersionStatus
+from truelift.store.versions import Confirmation, VersionKind, VersionRecord, Versions, VersionStatus
 
 log = logging.getLogger("truelift.store")
 
@@ -268,3 +268,32 @@ class ProjectStore:
     def version_status(self, project_id: str, kind: VersionKind, version: int) -> VersionStatus:
         with self.open(project_id) as folder:
             return Versions(folder, kind).status(version, folder.knowledge().facts)
+
+    def read_version(
+        self, project_id: str, kind: VersionKind, version: int | None = None
+    ) -> VersionRecord | None:
+        """The given version, or the current one; None when the project has none yet."""
+        with self.open(project_id) as folder:
+            versions = Versions(folder, kind)
+            number = versions.current() if version is None else version
+            return None if number is None else versions.read(number)
+
+    def opinions(self, project_id: str, kind: VersionKind, version: int) -> dict[str, str]:
+        with self.open(project_id) as folder:
+            return Versions(folder, kind).opinions(version)
+
+    def set_opinion(
+        self, project_id: str, kind: VersionKind, version: int, item_id: str, opinion: str
+    ) -> None:
+        with self.open(project_id) as folder:
+            Versions(folder, kind).set_opinion(version, item_id, opinion)
+        self._touch(project_id)
+
+    def run_dir(self, run_id: str) -> tuple[str, Path] | None:
+        """The project and folder holding ``runs/<run_id>``, if any project has it (read only)."""
+        for info in self.list():
+            with self.open(info.id) as folder:
+                path = folder.root / "runs" / run_id
+                if path.is_dir():
+                    return info.id, path
+        return None

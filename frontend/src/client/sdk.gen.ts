@@ -2,7 +2,7 @@
 
 import { type Client, type ClientMeta, formDataBodySerializer, type Options as Options2, type RequestResult, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { DagConfirmDagData, DagConfirmDagErrors, DagConfirmDagResponses, DagGetDagData, DagGetDagErrors, DagGetDagResponses, DagGetIdentificationData, DagGetIdentificationErrors, DagGetIdentificationResponses, DagPutEdgeOpinionData, DagPutEdgeOpinionErrors, DagPutEdgeOpinionResponses, HealthHealthData, HealthHealthResponses, IntakeConfirmMappingData, IntakeConfirmMappingErrors, IntakeConfirmMappingResponses, IntakeGetMappingData, IntakeGetMappingErrors, IntakeGetMappingResponses, IntakeGetProfileData, IntakeGetProfileErrors, IntakeGetProfileResponses, IntakePutMappingData, IntakePutMappingErrors, IntakePutMappingResponses, IntakeUploadDataData, IntakeUploadDataErrors, IntakeUploadDataResponses, ProjectsAcceptProposalsData, ProjectsAcceptProposalsErrors, ProjectsAcceptProposalsResponses, ProjectsCreateProjectData, ProjectsCreateProjectErrors, ProjectsCreateProjectResponses, ProjectsDecideProposalData, ProjectsDecideProposalErrors, ProjectsDecideProposalResponses, ProjectsGetProjectData, ProjectsGetProjectErrors, ProjectsGetProjectResponses, ProjectsListProjectsData, ProjectsListProjectsErrors, ProjectsListProjectsResponses, ProjectsListProposalsData, ProjectsListProposalsErrors, ProjectsListProposalsResponses, ResultsGetResultsData, ResultsGetResultsErrors, ResultsGetResultsResponses, RunsCancelRunData, RunsCancelRunErrors, RunsCancelRunResponses, RunsGetRunData, RunsGetRunErrors, RunsGetRunResponses, RunsListRunsData, RunsListRunsErrors, RunsListRunsResponses, RunsStartRunData, RunsStartRunErrors, RunsStartRunResponses, SetupGetDisclosureData, SetupGetDisclosureErrors, SetupGetDisclosureResponses, SetupGetLedgerData, SetupGetLedgerErrors, SetupGetLedgerResponses, SetupGetSetupData, SetupGetSetupErrors, SetupGetSetupResponses, SetupGetUsageData, SetupGetUsageErrors, SetupGetUsageResponses, SetupPostConsentData, SetupPostConsentErrors, SetupPostConsentResponses, SetupPutApiKeyData, SetupPutApiKeyErrors, SetupPutApiKeyResponses, SetupPutBudgetData, SetupPutBudgetErrors, SetupPutBudgetResponses } from './types.gen';
+import type { DagBuildData, DagBuildErrors, DagBuildResponses, DagConfirmDagData, DagConfirmDagErrors, DagConfirmDagResponses, DagGetDagData, DagGetDagErrors, DagGetDagResponses, DagGetIdentificationData, DagGetIdentificationErrors, DagGetIdentificationResponses, DagPutEdgeOpinionData, DagPutEdgeOpinionErrors, DagPutEdgeOpinionResponses, HealthHealthData, HealthHealthResponses, IntakeConfirmMappingData, IntakeConfirmMappingErrors, IntakeConfirmMappingResponses, IntakeGetMappingData, IntakeGetMappingErrors, IntakeGetMappingResponses, IntakeGetProfileData, IntakeGetProfileErrors, IntakeGetProfileResponses, IntakePutMappingData, IntakePutMappingErrors, IntakePutMappingResponses, IntakeUploadDataData, IntakeUploadDataErrors, IntakeUploadDataResponses, ProjectsAcceptProposalsData, ProjectsAcceptProposalsErrors, ProjectsAcceptProposalsResponses, ProjectsCreateProjectData, ProjectsCreateProjectErrors, ProjectsCreateProjectResponses, ProjectsDecideProposalData, ProjectsDecideProposalErrors, ProjectsDecideProposalResponses, ProjectsGetProjectData, ProjectsGetProjectErrors, ProjectsGetProjectResponses, ProjectsListProjectsData, ProjectsListProjectsErrors, ProjectsListProjectsResponses, ProjectsListProposalsData, ProjectsListProposalsErrors, ProjectsListProposalsResponses, ResultsGetResultsData, ResultsGetResultsErrors, ResultsGetResultsResponses, RunsCancelRunData, RunsCancelRunErrors, RunsCancelRunResponses, RunsGetRunData, RunsGetRunErrors, RunsGetRunResponses, RunsListRunsData, RunsListRunsErrors, RunsListRunsResponses, RunsStartRunData, RunsStartRunErrors, RunsStartRunResponses, SetupGetDisclosureData, SetupGetDisclosureErrors, SetupGetDisclosureResponses, SetupGetLedgerData, SetupGetLedgerErrors, SetupGetLedgerResponses, SetupGetSetupData, SetupGetSetupErrors, SetupGetSetupResponses, SetupGetUsageData, SetupGetUsageErrors, SetupGetUsageResponses, SetupPostConsentData, SetupPostConsentErrors, SetupPostConsentResponses, SetupPutApiKeyData, SetupPutApiKeyErrors, SetupPutApiKeyResponses, SetupPutBudgetData, SetupPutBudgetErrors, SetupPutBudgetResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -71,6 +71,21 @@ export const setupPostConsent = <ThrowOnError extends boolean = false>(options: 
  * Get Dag
  */
 export const dagGetDag = <ThrowOnError extends boolean = false>(options: Options<DagGetDagData, ThrowOnError>): RequestResult<DagGetDagResponses, DagGetDagErrors, ThrowOnError> => (options.client ?? client).get<DagGetDagResponses, DagGetDagErrors, ThrowOnError>({ url: '/api/projects/{project_id}/dag', ...options });
+
+/**
+ * Build
+ *
+ * Build the diagram from the confirmed facts and the business-type template. Unconfirmed
+ * facts and rejected proposals never reach it. Unchanged facts give the same version back.
+ */
+export const dagBuild = <ThrowOnError extends boolean = false>(options: Options<DagBuildData, ThrowOnError>): RequestResult<DagBuildResponses, DagBuildErrors, ThrowOnError> => (options.client ?? client).post<DagBuildResponses, DagBuildErrors, ThrowOnError>({
+    url: '/api/projects/{project_id}/dag/build',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Confirm Dag

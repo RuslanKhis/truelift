@@ -144,6 +144,23 @@ export type ConsentRecord = {
 };
 
 /**
+ * DagBuildIn
+ *
+ * Rebuild the diagram from the confirmed facts (G31). ``template`` is the business type; it can
+ * be left out once a version exists. ``dag_version`` is the version the caller saw (None at first).
+ */
+export type DagBuildIn = {
+    /**
+     * Dag Version
+     */
+    dag_version?: number | null;
+    /**
+     * Template
+     */
+    template?: string | null;
+};
+
+/**
  * DagEdge
  */
 export type DagEdge = {
@@ -212,6 +229,12 @@ export type DagVersion = {
      */
     nodes: Array<DagNode>;
     status: DagStatus;
+    /**
+     * Template
+     *
+     * The business-type template it was built from.
+     */
+    template?: string | null;
     /**
      * Version
      */
@@ -1484,6 +1507,56 @@ export type DagGetDagResponses = {
 
 export type DagGetDagResponse = DagGetDagResponses[keyof DagGetDagResponses];
 
+export type DagBuildData = {
+    body: DagBuildIn;
+    path: {
+        /**
+         * Project Id
+         */
+        project_id: string;
+    };
+    query?: never;
+    url: '/api/projects/{project_id}/dag/build';
+};
+
+export type DagBuildErrors = {
+    /**
+     * Open truelift from the link the truelift command printed.
+     */
+    401: ErrorBody;
+    /**
+     * This request is not allowed.
+     */
+    403: ErrorBody;
+    /**
+     * Not found.
+     */
+    404: ErrorBody;
+    /**
+     * This conflicts with the current state. Reload and try again.
+     */
+    409: ErrorBody;
+    /**
+     * Some fields are not valid.
+     */
+    422: ErrorBody;
+    /**
+     * Something went wrong. Quote the request ID if you report it.
+     */
+    500: ErrorBody;
+};
+
+export type DagBuildError = DagBuildErrors[keyof DagBuildErrors];
+
+export type DagBuildResponses = {
+    /**
+     * Successful Response
+     */
+    200: DagVersion;
+};
+
+export type DagBuildResponse = DagBuildResponses[keyof DagBuildResponses];
+
 export type DagConfirmDagData = {
     body: VersionIn;
     path: {
@@ -1538,13 +1611,13 @@ export type DagPutEdgeOpinionData = {
     body: OpinionIn;
     path: {
         /**
-         * Edge Id
-         */
-        edge_id: string;
-        /**
          * Project Id
          */
         project_id: string;
+        /**
+         * Edge Id
+         */
+        edge_id: string;
     };
     query?: never;
     url: '/api/projects/{project_id}/dag/edges/{edge_id}/opinion';
@@ -1613,6 +1686,10 @@ export type DagGetIdentificationErrors = {
      * Not found.
      */
     404: ErrorBody;
+    /**
+     * This conflicts with the current state. Reload and try again.
+     */
+    409: ErrorBody;
     /**
      * Some fields are not valid.
      */
