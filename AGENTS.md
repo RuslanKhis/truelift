@@ -20,6 +20,8 @@ You need [uv](https://docs.astral.sh/uv/) and Node ≥ 22.18 (for the generated 
 | `make check` | Guard, ruff, pytest, client drift check, pip-audit and npm audit. CI runs the same. The audits need network. |
 | `make client` | Dump `openapi.json` offline and regenerate `frontend/src/client`. Commit both after any API change. |
 | `uv run truelift` | Start the local app on 127.0.0.1 with a fresh token and open the browser (`--no-browser` prints the link) |
+| `uv run truelift sample-project --name demo --seed 1` | Create a project on the synthetic market with a scripted, confirmed DAG and mapping (G09) |
+| `uv run truelift run --project demo --dag v1 --profile quick` | Run the pipeline headless through the run gate and worker; exits 0 only on success (G09). Set `TRUELIFT_PROJECTS_DIR` and `TRUELIFT_STATE_DIR` to keep it out of `~/truelift` |
 | `make dist` | Build the sdist and wheel, then check their contents |
 | `make e2e` | End-to-end tests. None exist until G20, so it fails with "no tests ran". |
 | `uv run pytest tests/test_guard.py` | Guard tests (offline) |

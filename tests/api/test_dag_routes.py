@@ -8,7 +8,6 @@ results tests (labelled there). The real app, middleware, store and causal core 
 
 from __future__ import annotations
 
-import hashlib
 import json
 
 import pytest
@@ -299,20 +298,21 @@ def test_demo_project_still_answers_from_the_fakes(client) -> None:
 # --- results (C10) -------------------------------------------------------------------------
 
 
-def _write_run(settings, pid: str, run_id: str, *, manifest: bool = True, tamper: bool = False) -> None:
-    """Simulates the run folder a G09 worker writes: digest.json, then manifest.json last."""
-    folder = settings.projects_dir / pid / "runs" / run_id
-    folder.mkdir(parents=True)
+def _write_run(client, pid: str, run_id: str, *, manifest: bool = True, tamper: bool = False) -> None:
+    """A run folder as a succeeded G09 run leaves it, with digest.json listed in its manifest."""
+    from tests.worker.support import finished_run
+
+    store = client.app.state.store
     digest = fake_results("run-demo01").model_copy(update={"run_id": run_id})
-    raw = digest.model_dump_json().encode()
-    (folder / "digest.json").write_bytes(raw)
-    if manifest:
-        sha = hashlib.sha256(raw + (b" " if tamper else b"")).hexdigest()
-        (folder / "manifest.json").write_text(json.dumps({"files": {"digest.json": sha}}))
+    folder = finished_run(store, pid, run_id, digest=digest.model_dump_json().encode())
+    if tamper:
+        (folder.root / "digest.json").write_bytes(digest.model_dump_json().encode() + b" ")
+    if not manifest:
+        folder.manifest.unlink()
 
 
-def test_results_serve_the_digest_of_a_finished_run(client, settings, project) -> None:
-    _write_run(settings, project, "run-real0001")
+def test_results_serve_the_digest_of_a_finished_run(client, project) -> None:
+    _write_run(client, project, "run-real0001")
     response = client.get("/api/runs/run-real0001/results")
     assert response.status_code == 200
     body = response.json()
@@ -320,8 +320,8 @@ def test_results_serve_the_digest_of_a_finished_run(client, settings, project) -
 
 
 @pytest.mark.parametrize(("manifest", "tamper"), [(False, False), (True, True)])
-def test_no_results_without_a_matching_manifest(client, settings, project, manifest, tamper) -> None:
-    _write_run(settings, project, "run-real0002", manifest=manifest, tamper=tamper)
+def test_no_results_without_a_matching_manifest(client, project, manifest, tamper) -> None:
+    _write_run(client, project, "run-real0002", manifest=manifest, tamper=tamper)
     response = client.get("/api/runs/run-real0002/results")
     assert response.status_code == 409 and response.json()["code"] == "run_not_succeeded"
 

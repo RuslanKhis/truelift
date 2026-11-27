@@ -4,14 +4,21 @@ Middleware, outermost first: request ID, security headers, localhost guard (Host
 token in the URL), body limit. The ``/api`` router requires the launch token on every route,
 including its catch-all 404. ADK's own server (``get_fast_api_app``) is never mounted; the ADK
 Runner arrives in process with G13. No CORS middleware is installed.
+
+At startup the run manager reconciles the runs table (runs left queued or running with no live
+worker become ``interrupted``); at shutdown it stops active workers (G09, D8).
 """
 
 from __future__ import annotations
 
+import logging
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from typing import Any
 
 from fastapi import APIRouter, Depends, FastAPI
 from fastapi.routing import APIRoute
+from sqlalchemy.exc import SQLAlchemyError
 from starlette.middleware import Middleware
 
 from truelift import __version__
@@ -26,6 +33,9 @@ from truelift.api.spa import router as spa_router
 from truelift.api.stream import AGENT_EVENT
 from truelift.store import ProjectStore
 from truelift.store.db import StateDb
+from truelift.worker.manager import RunManager
+
+log = logging.getLogger("truelift.api")
 
 
 def _operation_id(route: APIRoute) -> str:
@@ -50,8 +60,22 @@ def _api_router() -> APIRouter:
     return api
 
 
+@asynccontextmanager
+async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
+    try:
+        app.state.runs.reconcile()
+    except SQLAlchemyError:
+        # The app still starts; the rows are reconciled at the next start (C10/A8).
+        log.exception("could not reconcile the runs table at startup")
+    try:
+        yield
+    finally:
+        app.state.runs.shutdown()
+
+
 def create_app(settings: Settings) -> FastAPI:
     app = FastAPI(
+        lifespan=_lifespan,
         title="truelift",
         version=__version__,
         summary="Local API of truelift. Every /api route needs the per-launch bearer token.",
@@ -76,6 +100,7 @@ def create_app(settings: Settings) -> FastAPI:
         StateDb(settings.state_dir / "state.db", busy_timeout_s=settings.db_busy_timeout_s),
         reserved_ids=frozenset({DEMO_PROJECT}),
     )
+    app.state.runs = RunManager(app.state.store)
     app.state.agent_busy = set()
     install_error_handlers(app)
 
