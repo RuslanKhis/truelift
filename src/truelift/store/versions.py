@@ -191,6 +191,32 @@ class Versions:
                 return VersionStatus.stale
         return VersionStatus.confirmed
 
+    # --- the user's opinion of each item (edge cards, G31) ---------------------------------------
+    # Kept in ``vN.opinions.yaml`` beside the immutable version, so they never change its hash.
+
+    def opinions(self, version: int) -> dict[str, str]:
+        name = f"v{version}.opinions.yaml"
+        try:
+            data = yaml.safe_load((self.dir / name).read_bytes()) or {}
+        except FileNotFoundError:
+            return {}
+        except yaml.YAMLError as exc:
+            raise ParseFailed([ParseIssue(self._rel(name), 1, "This opinions file is not valid.")]) from exc
+        if not isinstance(data, dict):
+            raise ParseFailed([ParseIssue(self._rel(name), 1, "This opinions file is not valid.")])
+        return {str(k): str(v) for k, v in data.items()}
+
+    def set_opinion(self, version: int, item_id: str, opinion: str) -> dict[str, str]:
+        """Record an opinion on an item of the current version; a version that is no longer
+        current is refused, like a write or a confirmation."""
+        if version != self.current():
+            raise StaleVersion(f"The {self._label} changed since you opened it. Reload and review again.")
+        self.read(version)
+        opinions = {**self.opinions(version), item_id: opinion}
+        data = yaml.safe_dump(dict(sorted(opinions.items())), sort_keys=False).encode()
+        atomic_write(self.dir / f"v{version}.opinions.yaml", data)
+        return opinions
+
     def stale_facts(self, version: int, facts: dict[str, Fact]) -> list[str]:
         """The cited facts that changed since confirmation, for the "needs review" message."""
         confirmation = self.confirmation(version)

@@ -348,6 +348,7 @@ class DagStatus(StrEnum):
 class DagVersion(BaseModel):
     version: int
     status: DagStatus
+    template: str | None = Field(default=None, description="The business-type template it was built from.")
     nodes: list[DagNode]
     edges: list[DagEdge]
 
@@ -355,6 +356,17 @@ class DagVersion(BaseModel):
 class OpinionIn(In):
     opinion: Opinion
     dag_version: int = Field(ge=1)
+
+
+TemplateId = Annotated[str, StringConstraints(pattern=r"^[a-z][a-z0-9_]{0,63}$")]
+
+
+class DagBuildIn(In):
+    """Rebuild the diagram from the confirmed facts (G31). ``template`` is the business type; it can
+    be left out once a version exists. ``dag_version`` is the version the caller saw (None at first)."""
+
+    template: TemplateId | None = None
+    dag_version: int | None = Field(default=None, ge=1)
 
 
 class Remedy(StrEnum):
